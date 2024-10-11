@@ -56,3 +56,21 @@ class Transactions(db.Model):
                 'amount': self.amount,
                 'description': self.description,
                 'date': self.date}
+
+
+class FixedExpenses(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    expected_amount = db.Column(db.Float(), unique=False, nullable=False)
+    real_amount = db.Column(db.Float(), unique=False, nullable=False)
+    period = db.Column(db.String(), unique=False, nullable=False)
+    next_date = db.Column(db.DateTime(), nullable=False)
+
+    def __repr__(self):
+        return f'<Fixed Expenses {self.id} - {self.expected_amount}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'expected_amount': self.expected_amount,
+                'real_amount': self.real_amount,
+                'period': self.period,
+                'next_date': self.next_date}
