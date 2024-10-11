@@ -40,3 +40,19 @@ class Sources(db.Model):
                 'name': self.name,
                 'type': self.type,
                 'amount': self.amount}
+
+
+class Transactions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float(), unique=False, nullable=False)
+    description = db.Column(db.String(), unique=False, nullable=True)
+    date = db.Column(db.DateTime(), nullable=False, default=datetime.now(tz=timezone.utc))
+
+    def __repr__(self):
+        return f'<Transaction {self.id} - {self.amount}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'amount': self.amount,
+                'description': self.description,
+                'date': self.date}
