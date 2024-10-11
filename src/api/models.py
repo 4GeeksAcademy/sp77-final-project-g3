@@ -24,3 +24,19 @@ class Users(db.Model):
                 'last_name': self.last_name,
                 'phone_number': self.phone_number,
                 'country': self.country}
+
+
+class Sources(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=False, nullable=False)
+    type = db.Column(db.String(80), unique=False, nullable=False)
+    amount = db.Column(db.Float(), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'<Source {self.id} - {self.name}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'name': self.name,
+                'type': self.type,
+                'amount': self.amount}
