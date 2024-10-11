@@ -90,3 +90,19 @@ class FixedExpenses(db.Model):
                 'real_amount': self.real_amount,
                 'period': self.period,
                 'next_date': self.next_date}
+    
+
+class Budgets(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    budget_amount = db.Column(db.Float(), unique=False, nullable=False)
+    target_period = db.Column(db.DateTime(), nullable=False)
+    total_expense = db.Column(db.Float(), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'<Budget {self.id} - {self.budget_amount}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'budget_amount': self.budget_amount,
+                'target_period': self.target_period,
+                'total_expense': self.total_expense}
