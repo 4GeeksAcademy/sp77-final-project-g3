@@ -42,6 +42,20 @@ class Sources(db.Model):
                 'amount': self.amount}
     
 
+class Balances(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    total_balance = db.Column(db.Float(), unique=False, nullable=False)
+    monthly_expenses = db.Column(db.Float(), unique=False, nullable=False)
+
+    def __repr__(self):
+        return f'<Balance {self.id} - {self.total_balance}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'total_balance': self.total_balance,
+                'monthly_expenses': self.monthly_expenses}
+    
+
 class Categories(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(), unique=False, nullable=False)
