@@ -40,6 +40,22 @@ class Sources(db.Model):
                 'name': self.name,
                 'type': self.type,
                 'amount': self.amount}
+    
+
+class Categories(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(), unique=False, nullable=False)
+    name = db.Column(db.String(), unique=False, nullable=False)
+    description = db.Column(db.String(), unique=False, nullable=True)
+
+    def __repr__(self):
+        return f'<Category {self.id} - {self.type} - {self.name}>'
+
+    def serialize(self):
+        return {'id': self.id,
+                'type': self.type,
+                'name': self.name,
+                'description': self.description}
 
 
 class Transactions(db.Model):
