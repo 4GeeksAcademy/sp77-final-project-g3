@@ -113,6 +113,58 @@ def balances():
     return response_body, 200
 
 
+@api.route('/categories', methods=['GET', 'POST'])
+@jwt_required()
+def categories():
+    response_body = {}
+    current_user = get_jwt_identity()
+    if request.method == 'GET':
+        rows = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'])).scalars()
+        result = [row.serialize() for row in rows]
+        response_body['message'] = "List of the categories"
+        response_body['results'] = result
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        row = Categories(id = data.get('id'),
+                         type_category = data.get('type_category'),
+                         name = data.get('name'),
+                         description = data.get('description'),
+                         user_id = data.get('user_id'))
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = "Creating a category"
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    
 
-
-
+@api.route('/categories/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def category(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'], Categories.id == id)).scalar()
+    if not row:
+        response_body['message'] = f'The category {id} does not exist'
+        response_body['results'] = {}
+        return response_body, 400
+    if request.method == 'GET':
+        response_body['message'] = f'Category data {id}'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'PUT':
+        data = request.json
+        row.type_category = data.get('type_category')
+        row.name = data.get('name')
+        row.description = data.get('description')
+        row.user_id = data.get('user_id')
+        db.session.commit()
+        response_body['message'] = f'Category {id} edited'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = f'Category {id} deleted'
+        response_body['results'] = {}
+        return response_body, 200
