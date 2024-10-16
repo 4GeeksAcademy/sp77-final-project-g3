@@ -48,7 +48,7 @@ def sources():
     if request.method == 'GET':
         rows = db.session.execute(db.select(Sources).where(Sources.user_id == current_user['user_id'])).scalars()
         result = [row.serialize() for row in rows]
-        response_body['message'] = "Nothing for now (GET)"
+        response_body['message'] = "These are your sources (GET)"
         response_body['results'] = result
         return response_body, 200
     if request.method == 'POST':
@@ -60,7 +60,7 @@ def sources():
                       user_id = data.get('user_id'))
         db.session.add(row)
         db.session.commit()
-        response_body['message'] = "Nothing for now (POST)"
+        response_body['message'] = "You have a new source (POST)"
         response_body['results'] = row.serialize()
         return response_body, 200
     
@@ -76,7 +76,7 @@ def source(id):
         response_body['results'] = {}
         return response_body, 400
     if request.method == 'GET':
-        response_body['message'] = "Nothing for now (GET)"
+        response_body['message'] = f"This is the source no. {id} (GET)"
         response_body['results'] = row.serialize()
         return response_body, 200
     if request.method == 'PUT':
@@ -87,13 +87,13 @@ def source(id):
         row.amount = data.get('amount')
         row.user_id = data.get('user_id')
         db.session.commit()
-        response_body['message'] = "Nothing for now (PUT)"
+        response_body['message'] = "All changes were saved (PUT)"
         response_body['results'] = row.serialize()
         return response_body, 200
     if request.method == 'DELETE':
         db.session.delete(row)
         db.session.commit()
-        response_body['message'] = "Nothing for now (DELETE)"
+        response_body['message'] = "The source was deleted (DELETE)"
         response_body['results'] = {}
         return response_body, 200
     
@@ -112,7 +112,7 @@ def balances():
     response_body['results'] = result
     return response_body, 200
 
-  
+
 @api.route('/categories', methods=['GET', 'POST'])
 @jwt_required()
 def categories():
@@ -231,4 +231,62 @@ def transaction(id):
         db.session.commit()
         response_body['message'] = f'You just deleted transaction: {id}'
         response_body['results'] = {}
-        return response_body, 200    
+        return response_body, 200
+
+
+@api.route('/budgets', methods=['GET', 'POST'])
+@jwt_required()
+def budgets():
+    response_body = {}
+    current_user = get_jwt_identity()
+    if request.method == 'GET':
+        rows = db.session.execute(db.select(Budgets).where(Categories.user_id == current_user['user_id'])).scalars()
+        result = [row.serialize() for row in rows]
+        response_body['message'] = "These are your budgets (GET)"
+        response_body['results'] = result
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        row = Budgets(id = data.get('id'),
+                      budget_amount = data.get('budget_amount'),
+                      target_period = data.get('target_period'),
+                      total_expense = data.get('total_expense'),
+                      category_id = data.get('category_id'))
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = "You have a new budget (POST)"
+        response_body['results'] = row.serialize()
+        return response_body, 200
+
+
+@api.route('/budgets/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def budget(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Budgets).where(Categories.user_id == current_user['user_id'], Budgets.id == id)).scalar()
+    if not row:
+        response_body['message'] = "This budget does not exist"
+        response_body['results'] = {}
+        return response_body, 400
+    if request.method == 'GET':
+        response_body['message'] = f"This is the budget no. {id} (GET)"
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'PUT':
+        data = request.json
+        row.id = data.get('id')
+        row.budget_amount = data.get('budget_amount')
+        row.target_period = data.get('target_period')
+        row.total_expense = data.get('total_expense')
+        row.category_id = data.get('category_id')
+        db.session.commit()
+        response_body['message'] = "All changes were saved (PUT)"
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = "The budget was deleted (DELETE)"
+        response_body['results'] = {}
+        return response_body, 200 
