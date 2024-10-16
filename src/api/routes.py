@@ -231,8 +231,67 @@ def transaction(id):
         db.session.commit()
         response_body['message'] = f'You just deleted transaction: {id}'
         response_body['results'] = {}
-        return response_body, 200
+        return response_body, 200    
 
+
+@api.route('/fixed-expenses', methods=['GET', 'POST'])
+@jwt_required()
+def fixed_expenses():
+    response_body = {}
+    current_user = get_jwt_identity()
+    if request.method == 'GET':
+        categories = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'])).scalar()
+        category_ids = [category.id for category in categories]
+        expenses = db.session.execute(db.select(FixedExpenses).where(FixedExpenses.category_id.in_(category_ids))).scalars()
+        response_body['message'] = "you got the fixed expenses list!"
+        response_body['results'] = [expense.serialize() for expense in expenses]
+        return jsonify(response_body), 200
+    if request.method == 'POST':
+        data = request.json
+        category = db.session.execute(db.select(Categories).where(Categories.id == data['category_id'], Categories.user_id == current_user['user_id'])).scalar()
+        if not category:
+            response_body['message'] = "Invalid category for the current user"
+            return jsonify(response_body), 400
+        new_expense = FixedExpenses(
+            description = data['description'],
+            expected_amount = data['expected_amount'],
+            period = data['period'],
+            next_date = data['next-date'],
+            category_id = category.id,
+            is_active_next_period = data['is_active_next_period'])
+        db.session.add(new_expense)
+        db.session.commit()
+        response_body['message'] = "you posted a fixed expense!"
+        response_body['results'] = new_expense.serialize()
+        return jsonify(new_expense.serialize()), 201
+ 
+
+@api.route('/fixed-expenses/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def fixed_expense_by_id(id):
+    expense = FixedExpenses.query.get_or_404(id)
+    current_user = get_jwt_identity()
+    category = db.session.execute(db.select(Categories).where(Categories.id == expense.category_id, Categories.user_id == current_user['user_id'])).scalar()
+    if not category:
+        return jsonify({'message': 'Unauthorized access to this expense'}), 403
+    if request.method == 'GET':
+        return jsonify(expense.serialize()), 200
+    if request.method == 'PUT':
+        data = request.json
+        expense.description = data.get('description', expense.description)
+        expense.expected_amount = data.get('expected_amount', expense.expected_amount)
+        expense.real_amount = data.get('real_amount', expense.real_amount)
+        expense.period = data.get('period', expense.period)
+        expense.next_date = data.get('next_date', expense.next_date)
+        expense.category_id = data.get('category_id', expense.category_id)
+        expense.is_active_next_period = data.get('is_active_next_period', expense.is_active_next_period)
+        db.session.commit()
+        return jsonify(expense.serialize()), 200
+    if request.method == 'DELETE':
+        db.session.delete(expense)
+        db.session.commit()
+        return jsonify({'message:':'you deleted a fixed expense!'}), 200
+        
 
 @api.route('/budgets', methods=['GET', 'POST'])
 @jwt_required()
