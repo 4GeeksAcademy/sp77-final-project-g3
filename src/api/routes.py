@@ -112,7 +112,7 @@ def balances():
     response_body['results'] = result
     return response_body, 200
 
-
+  
 @api.route('/categories', methods=['GET', 'POST'])
 @jwt_required()
 def categories():
@@ -168,3 +168,4 @@ def category(id):
         response_body['message'] = f'Category {id} deleted'
         response_body['results'] = {}
         return response_body, 200
+
