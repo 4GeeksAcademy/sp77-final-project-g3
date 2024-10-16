@@ -113,6 +113,127 @@ def balances():
     return response_body, 200
 
 
+@api.route('/categories', methods=['GET', 'POST'])
+@jwt_required()
+def categories():
+    response_body = {}
+    current_user = get_jwt_identity()
+    if request.method == 'GET':
+        rows = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'])).scalars()
+        result = [row.serialize() for row in rows]
+        response_body['message'] = "List of the categories"
+        response_body['results'] = result
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        row = Categories(id = data.get('id'),
+                         type_category = data.get('type_category'),
+                         name = data.get('name'),
+                         description = data.get('description'),
+                         user_id = data.get('user_id'))
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = "Creating a category"
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    
+
+@api.route('/categories/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def category(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'], Categories.id == id)).scalar()
+    if not row:
+        response_body['message'] = f'The category {id} does not exist'
+        response_body['results'] = {}
+        return response_body, 400
+    if request.method == 'GET':
+        response_body['message'] = f'Category data {id}'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'PUT':
+        data = request.json
+        row.type_category = data.get('type_category')
+        row.name = data.get('name')
+        row.description = data.get('description')
+        row.user_id = data.get('user_id')
+        db.session.commit()
+        response_body['message'] = f'Category {id} edited'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = f'Category {id} deleted'
+        response_body['results'] = {}
+        return response_body, 200
+
+
+@api.route('/transactions', methods=['GET', 'POST'])
+@jwt_required()
+def transactions():
+    response_body = {}
+    current_user = get_jwt_identity()
+    rows = db.session.execute(db.select(Transactions).join(Sources).where(Sources.user_id == current_user['user_id'])).scalars().all()
+    for row in rows:
+        print(f"{row.source_to.user_id} - current_user {current_user['user_id']}")
+        if row.source_to.user_id != current_user['user_id']:
+            response_body['message'] = f'No puedes hacer esta transaccion: {row.id}'
+            response_body['results'] = {}
+            return response_body, 403
+    if request.method == 'GET': 
+        result = [i.serialize() for i in rows]
+        response_body['message'] = 'This are all your Transactions'
+        response_body['results'] = result
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        row = Transactions(id = data.get('id'),
+                           amount = data.get('amount'),
+                           description = data.get('description'),
+                           date = data.get('date'),
+                           source_id = data.get('source_id'),
+                           category_id = data.get('category_id'))
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = 'Creaste una nueva Transaccions'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+
+
+@api.route('/transactions/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def transaction(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Transactions).join(Sources).where(Sources.user_id == current_user['user_id'], Transactions.id == id)).scalar()
+    if not row:
+        response_body['message'] = "This Transaction does not exist"
+        response_body['results'] = {}
+        return response_body, 400
+    if request.method  == 'GET':
+        response_body['message'] = f'This is the transaction: {id}'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'PUT':
+        data = request.json
+        row.amount = data.get('amount', row.amount)
+        row.description = data.get('description', row.description)
+        row.date = data.get('date', row.date)
+        row.source_id = data.get('source_id', row.source_id)
+        row.category_id = data.get('category_id', row.category_id)
+        response_body['message'] = f'You just edited transaction: {id}'
+        response_body['results'] = row.serialize()
+        db.session.commit()
+    if request.method == 'DELETE':
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = f'You just deleted transaction: {id}'
+        response_body['results'] = {}
+        return response_body, 200
+
+
 @api.route('/budgets', methods=['GET', 'POST'])
 @jwt_required()
 def budgets():
@@ -136,7 +257,7 @@ def budgets():
         response_body['message'] = "You have a new budget (POST)"
         response_body['results'] = row.serialize()
         return response_body, 200
-    
+
 
 @api.route('/budgets/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @jwt_required()
@@ -168,4 +289,4 @@ def budget(id):
         db.session.commit()
         response_body['message'] = "The budget was deleted (DELETE)"
         response_body['results'] = {}
-        return response_body, 200
+        return response_body, 200 
