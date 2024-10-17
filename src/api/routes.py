@@ -63,7 +63,7 @@ def sources():
         response_body['message'] = "You have a new source (POST)"
         response_body['results'] = row.serialize()
         return response_body, 200
-    
+
 
 @api.route('/sources/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @jwt_required()
@@ -81,7 +81,6 @@ def source(id):
         return response_body, 200
     if request.method == 'PUT':
         data = request.json
-        row.id = data.get('id')
         row.name = data.get('name')
         row.type_source = data.get('type_source')
         row.amount = data.get('amount')
@@ -96,7 +95,7 @@ def source(id):
         response_body['message'] = "The source was deleted (DELETE)"
         response_body['results'] = {}
         return response_body, 200
-    
+
 
 @api.route('/balances', methods=['GET'])
 @jwt_required()
@@ -136,7 +135,7 @@ def categories():
         response_body['message'] = "Creating a category"
         response_body['results'] = row.serialize()
         return response_body, 200
-    
+
 
 @api.route('/categories/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @jwt_required()
@@ -189,8 +188,7 @@ def transactions():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Transactions(id = data.get('id'),
-                           amount = data.get('amount'),
+        row = Transactions(amount = data.get('amount'),
                            description = data.get('description'),
                            date = data.get('date'),
                            source_id = data.get('source_id'),
@@ -226,6 +224,7 @@ def transaction(id):
         response_body['message'] = f'You just edited transaction: {id}'
         response_body['results'] = row.serialize()
         db.session.commit()
+        return response_body, 200
     if request.method == 'DELETE':
         db.session.delete(row)
         db.session.commit()
@@ -239,32 +238,28 @@ def transaction(id):
 def fixed_expenses():
     response_body = {}
     current_user = get_jwt_identity()
+    expenses = db.session.execute(db.select(FixedExpenses).join(Categories).where(Categories.user_id == current_user['user_id'])).scalars()
     if request.method == 'GET':
-        categories = db.session.execute(db.select(Categories).where(Categories.user_id == current_user['user_id'])).scalar()
-        category_ids = [category.id for category in categories]
-        expenses = db.session.execute(db.select(FixedExpenses).where(FixedExpenses.category_id.in_(category_ids))).scalars()
+        result = [row.serialize() for row in expenses]
         response_body['message'] = "you got the fixed expenses list!"
-        response_body['results'] = [expense.serialize() for expense in expenses]
+        response_body['results'] = result
         return jsonify(response_body), 200
     if request.method == 'POST':
         data = request.json
-        category = db.session.execute(db.select(Categories).where(Categories.id == data['category_id'], Categories.user_id == current_user['user_id'])).scalar()
-        if not category:
-            response_body['message'] = "Invalid category for the current user"
-            return jsonify(response_body), 400
         new_expense = FixedExpenses(
-            description = data['description'],
-            expected_amount = data['expected_amount'],
-            period = data['period'],
-            next_date = data['next-date'],
-            category_id = category.id,
-            is_active_next_period = data['is_active_next_period'])
+            description = data.get('description'),
+            expected_amount = data.get('expected_amount'),
+            real_amount = data.get('real_amount'),
+            period = data.get('period'),
+            next_date = data.get('next_date'),
+            category_id = data.get('category.id'),
+            is_active_next_period = data.get('is_active_next_period'))
         db.session.add(new_expense)
         db.session.commit()
         response_body['message'] = "you posted a fixed expense!"
         response_body['results'] = new_expense.serialize()
-        return jsonify(new_expense.serialize()), 201
- 
+        return response_body, 200
+
 
 @api.route('/fixed-expenses/<int:id>', methods=['GET', 'PUT', 'DELETE'])
 @jwt_required()
@@ -291,7 +286,7 @@ def fixed_expense_by_id(id):
         db.session.delete(expense)
         db.session.commit()
         return jsonify({'message:':'you deleted a fixed expense!'}), 200
-        
+
 
 @api.route('/budgets', methods=['GET', 'POST'])
 @jwt_required()
@@ -334,7 +329,6 @@ def budget(id):
         return response_body, 200
     if request.method == 'PUT':
         data = request.json
-        row.id = data.get('id')
         row.budget_amount = data.get('budget_amount')
         row.target_period = data.get('target_period')
         row.total_expense = data.get('total_expense')
