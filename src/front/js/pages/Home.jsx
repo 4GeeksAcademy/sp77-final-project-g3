@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext.js";
+import { Link } from "react-router-dom";
 import someImg from "../../img/someimage.jpg";
 import "../../styles/home.css";
 import { Benefits } from "../component/Benefits.jsx";
@@ -16,7 +17,9 @@ export const Home = () => {
 						Managing your finances has never been easier. With our simple and intuitive platform, you can track your income and expenses, create personalized budgets, and monitor your financial health—all in one place. Take control of your finances today and start making smarter decisions for a better tomorrow.
 					</p>
 					<div className="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-						<button id="btn-register" type="button" className="btn btn-primary btn-lg px-4 me-sm-3">Get Started</button>
+						<Link to="/login">
+							<button id="btn-register" type="button" className="btn btn-primary btn-lg px-4 me-sm-3">Get Started</button>
+						</Link>
 					</div>
 				</div>
 				<div className="overflow-hidden" style={{ maxHeight: '50vh' }}>
