@@ -21,3 +21,29 @@
     color: white;
     ;
 }
+
+
+/* Este cambia el color de los pills del login */
+.nav-pills .nav-link.active,
+.show>.nav-pills .nav-link{
+    background: #2D3748 !important;
+}
+
+.nav-pills .nav-link {
+    color: #2D3748; /* Color del texto cuando la pestaña no está activa */
+  }
+
+.nav-pills .nav-link.active {
+    color: #E2E8F0; /* Color del texto cuando la pestaña está activa */
+}
+
+/* este cambio el color del checkbox de remember me */
+.custom-checkbox input[type="checkbox"]:checked {
+    background-color: #2D3748; 
+    border-color: #2D3748; 
+}
+
+.textarea-large {
+    height: 200px; /* Ajusta la altura a lo que necesites */
+    width: 100%; /* Ocupa el 100% del ancho del contenedor */
+}
