@@ -11,7 +11,8 @@ import { Sidebar } from "./component/Sidebar.jsx";
 import { Home } from "./pages/Home.jsx";
 import { Demo } from "./pages/Demo.jsx";
 import { Single } from "./pages/Single.jsx";
-
+import { Login } from "./pages/Login.jsx";
+import { Contact } from "./pages/Contact.jsx";
 
 // Create your first component
 const Layout = () => {
@@ -25,11 +26,19 @@ const Layout = () => {
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Routes>
-                        {/* Páginas con solo Navbar */}
+                        {/* Páginas con solo Navbar y Footer*/}
                         <Route path="/" element={
                             <>
                                 <Navbar />
                                 <Home />
+                                <Footer />
+                            </>
+                        }
+                        />
+                        <Route path="/login" element={
+                            <>
+                                <Navbar />
+                                <Login />
                                 <Footer />
                             </>
                         }
@@ -48,6 +57,19 @@ const Layout = () => {
                                 <Single />
                             </div>
                         }
+                        />
+                        <Route
+                            path="/contact"
+                            element={
+                                <div className="d-flex  min-vh-100">
+                                    <div className="col-3">
+                                        <Sidebar />
+                                    </div>
+                                    <div className="col-9">
+                                        <Contact />
+                                    </div>
+                                </div>
+                            }
                         />
                         <Route path="*" element={<h1>Not found!</h1>} />
                     </Routes>
