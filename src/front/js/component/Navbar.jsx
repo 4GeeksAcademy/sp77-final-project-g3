@@ -38,16 +38,11 @@ export const Navbar = () => {
 							</li>
 							<li className="nav-item">
 								<div>
-									<button id="boton-login" className="btn fw-bold">
-										Login
-									</button>
-								</div>
-							</li>
-							<li className="nav-item mx-2">
-								<div>
-									<button id="boton-signup" className="btn fw-bold">
-										SignUp
-									</button>
+									<Link to="/login">
+										<button id="boton-login" className="btn fw-bold">
+											Login
+										</button>
+									</Link>
 								</div>
 							</li>
 						</ul>

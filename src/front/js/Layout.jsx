@@ -11,7 +11,7 @@ import { Sidebar } from "./component/Sidebar.jsx";
 import { Home } from "./pages/Home.jsx";
 import { Demo } from "./pages/Demo.jsx";
 import { Single } from "./pages/Single.jsx";
-
+import { Login } from "./pages/Login.jsx";
 
 // Create your first component
 const Layout = () => {
@@ -25,11 +25,19 @@ const Layout = () => {
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Routes>
-                        {/* Páginas con solo Navbar */}
+                        {/* Páginas con solo Navbar y Footer*/}
                         <Route path="/" element={
                             <>
                                 <Navbar />
                                 <Home />
+                                <Footer />
+                            </>
+                        }
+                        />
+                        <Route path="/login" element={
+                            <>
+                                <Navbar />
+                                <Login />
                                 <Footer />
                             </>
                         }

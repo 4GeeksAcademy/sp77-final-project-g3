@@ -1,24 +1,23 @@
 .link-secondary {
-    color: #2D3748; 
-    text-decoration: none; 
+    color: #2D3748;
+    text-decoration: none;
 }
+
 .link-secondary:hover {
     color: #E2E8F0;
 }
+
 .text-dark {
-    color: #2D3748!important;
+    color: #2D3748 !important;
 }
 
 .bg-success {
     background-color: #2F855A;
     color: white;
 }
+
 .bg-dark {
     background-color: #2D3748;
     color: white;
+    ;
 }
-.bg-warning {
-    background-color: #F9D423;
-    color: white;
-}
-
