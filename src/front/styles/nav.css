@@ -1,0 +1,68 @@
+li {
+    list-style-type: none;
+}
+#boton-signup {
+    background-color: #2F855A;
+    color: #E2E8F0
+}
+#boton-login {
+    background-color: #2D3748;
+    color: #E2E8F0
+}
+#boton-logout {
+    background-color: #2D3748;
+    color: #E2E8F0
+}
+
+/* Para pantallas más grandes (por encima de 1024px) */
+.navbar .nav-link {
+    color: #2D3748 !important;
+}
+.navbar .nav-link:hover {
+    color: #E2E8F0 !important; 
+}
+.navbar .navbar-brand {
+    color: #2D3748 !important;
+}
+.navbar .btn {
+    color: #E2E8F0 !important;
+}
+
+/* Para pantallas de menos de 1024px */
+@media (max-width: 1024px) {
+    .navbar-dark .navbar-nav .nav-link {
+        color: black !important; 
+    }
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: black !important; 
+    }
+}
+
+/* Para pantallas de menos de 768px */
+@media (max-width: 768px) {
+    .navbar-dark .navbar-nav .nav-link {
+        color: black !important;
+    }
+    .navbar-dark .navbar-nav .nav-link:hover {
+        color: black !important;
+    }
+}
+
+.sidebar-link {
+    color: #2D3748;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    color: #E2E8F0; 
+}
+.user-settings {
+    color: #2D3748;
+    text-decoration: none;
+}
+.user-settings:hover {
+    color: #E2E8F0; 
+}
+.dropdown-menu {
+    background-color: #2D3748;
+}
