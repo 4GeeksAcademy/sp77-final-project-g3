@@ -7,9 +7,9 @@ export const Login = () => {
         <div className="d-flex justify-content-center align-items-center">
             <div className="container-flex mt-5">
                 {/* Pills navs */}
-                <ul className="nav nav-pills nav-justified mb-3" id="ex1" role="tablist">
-                    <li className="nav-item" role="presentation">
-                        <a className="nav-link active" id="tab-login" data-bs-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true" >
+                <ul className="nav nav-pills nav-justified mb-3 " id="ex1" role="tablist"  >
+                    <li className="nav-item" role="presentation" >
+                        <a className="nav-link active" id="tab-login" data-bs-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true">
                             Login
                         </a>
                     </li>
@@ -52,9 +52,9 @@ export const Login = () => {
                             </div>
                             <div className="row mb-4">
                                 <div className="col-md-6 d-flex justify-content-center">
-                                    <div className="form-check mb-3 mb-md-0">
-                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked style={{ backgrounColor: '#2D3748' }} />
-                                        <label className="form-check-label" htmlFor="loginCheck">
+                                    <div className="form-check mb-3 mb-md-0 custom-checkbox">
+                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked  />
+                                        <label className="form-check-label " htmlFor="loginCheck" >
                                             Remember me
                                         </label>
                                     </div>
@@ -63,7 +63,7 @@ export const Login = () => {
                                     <Link to="/forgot-password" style={{ color: '#2D3748' }}>Lost password?</Link>
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-block mb-4" style={{ color: '#2D3748' }}>
+                            <button type="submit" className="btn btn-block mb-4" style={{ backgroundColor: '#2D3748', color: '#E2E8F0'}}>
                                 Sign in
                             </button>
                         </form>
@@ -122,13 +122,13 @@ export const Login = () => {
                                     Phone Number
                                 </label>
                             </div>
-                            <div className="form-check d-flex justify-content-center mb-4">
+                            <div className="form-check d-flex justify-content-center mb-4 custom-checkbox">
                                 <input className="form-check-input me-2" type="checkbox" id="registerCheck" defaultChecked />
                                 <label className="form-check-label" htmlFor="registerCheck">
                                     I have read and agree to the terms
                                 </label>
                             </div>
-                            <button type="submit" className="btn btn-primary btn-block mb-3">
+                            <button type="submit" className="btn btn-primary btn-block mb-3" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} >
                                 Sign up
                             </button>
                         </form>

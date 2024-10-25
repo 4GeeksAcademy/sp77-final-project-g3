@@ -12,6 +12,7 @@ import { Home } from "./pages/Home.jsx";
 import { Demo } from "./pages/Demo.jsx";
 import { Single } from "./pages/Single.jsx";
 import { Login } from "./pages/Login.jsx";
+import { Contact } from "./pages/Contact.jsx";
 
 // Create your first component
 const Layout = () => {
@@ -56,6 +57,19 @@ const Layout = () => {
                                 <Single />
                             </div>
                         }
+                        />
+                        <Route
+                            path="/contact"
+                            element={
+                                <div className="d-flex  min-vh-100">
+                                    <div className="col-3">
+                                        <Sidebar />
+                                    </div>
+                                    <div className="col-9">
+                                        <Contact />
+                                    </div>
+                                </div>
+                            }
                         />
                         <Route path="*" element={<h1>Not found!</h1>} />
                     </Routes>
