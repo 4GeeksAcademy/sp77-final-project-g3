@@ -31,9 +31,7 @@ def signup():
                      password = data.get('password'),
                      first_name = data.get('first_name'),
                      last_name = data.get('last_name'),
-                     phone_number = data.get('phone_number'),
-                     country = data.get('country'),
-                     photo_url = data.get('photo_url'))
+                     phone_number = data.get('phone_number'))
     db.session.add(new_user)
     db.session.commit()
     response_body['message'] = "Registration succeeded!"
@@ -70,6 +68,7 @@ def profile():
     row.last_name = data.get('last_name')
     row.phone_number = data.get('phone_number')
     row.country = data.get('country')
+    row.photo_url = data.get('photo_url')
     db.session.commit()
     response_body['message'] = "Profile updated!"
     response_body['results'] = row.serialize()
