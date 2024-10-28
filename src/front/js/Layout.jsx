@@ -13,6 +13,8 @@ import { Demo } from "./pages/Demo.jsx";
 import { Single } from "./pages/Single.jsx";
 import { Login } from "./pages/Login.jsx";
 import { Contact } from "./pages/Contact.jsx";
+import { AuthProvider } from "../../contexts/authContext/index.jsx";
+
 
 // Create your first component
 const Layout = () => {
@@ -22,7 +24,7 @@ const Layout = () => {
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
-        <div>
+        <AuthProvider>
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Routes>
@@ -75,7 +77,7 @@ const Layout = () => {
                     </Routes>
                 </ScrollToTop>
             </BrowserRouter>
-        </div>
+        </AuthProvider>
     );
 };
 
