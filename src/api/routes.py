@@ -9,17 +9,40 @@ from datetime import datetime, timezone
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+from dotenv import load_dotenv
+import os
 import requests
 
 
 api = Blueprint('api', __name__)
 CORS(api)  # Allow CORS requests to this API
+load_dotenv()
+
+
+yapily_id = os.getenv('YAPILY_ID')
+yapily_secret = os.getenv('YAPILY_SECRET')
 
 
 @api.route('/hello', methods=['GET'])
 def handle_hello():
     response_body = {}
     response_body["message"]= "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
+    return response_body, 200
+
+
+@api.route('/signup', methods=['POST'])
+def signup():
+    response_body = {}
+    data = request.json
+    new_user = Users(email = data.get('email'),
+                     password = data.get('password'),
+                     first_name = data.get('first_name'),
+                     last_name = data.get('last_name'),
+                     phone_number = data.get('phone_number'))
+    db.session.add(new_user)
+    db.session.commit()
+    response_body['message'] = "Registration succeeded!"
+    response_body['results'] = new_user.serialize()
     return response_body, 200
 
 
@@ -40,6 +63,127 @@ def login():
     return response_body, 200
 
 
+@api.route('/profile', methods=['PUT'])
+@jwt_required()
+def profile():
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
+    data = request.json
+    row.email = data.get('email')
+    row.first_name = data.get('first_name')
+    row.last_name = data.get('last_name')
+    row.phone_number = data.get('phone_number')
+    row.country = data.get('country')
+    row.photo_url = data.get('photo_url')
+    db.session.commit()
+    response_body['message'] = "Profile updated!"
+    response_body['results'] = row.serialize()
+    return response_body, 200
+
+
+@api.route('/remove-account', methods=['DELETE'])
+@jwt_required()
+def remove_account():
+    response_body = {}
+    current_user = get_jwt_identity()
+    account = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
+    db.session.delete(account)
+    db.session.commit()
+    response_body['message'] = "Your account was successfully removed!"
+    response_body['results'] = {}
+    return response_body, 200
+
+
+@api.route('/institutions', methods=['GET'])
+def institutions():
+    response_body = {}
+    url = 'https://api.yapily.com/institutions'
+    response = requests.get(url, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are the available institutions in the app"
+    response_body['results'] = data.get('institutions')
+    return response_body, 200
+
+
+@api.route('/account-auth-requests', methods=['POST'])
+def account_auth_requests():
+    response_body = {}
+    url = 'https://api.yapily.com/account-auth-requests'
+    payload = {
+        "applicationUserId": "string",
+        "institutionId": "modelo-sandbox",
+        "callback": "https://display-parameters.com/"
+    }
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, json=payload, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "You received authorization"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/accounts', methods=['GET'])
+def accounts():
+    response_body = {}
+    url = 'https://api.yapily.com/accounts'
+    headers = {
+        "consent": "string",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are your accounts registered in Yapily"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/yapily-transactions', methods=['GET'])
+def yapily_transactions():
+    response_body = {}
+    account_id = "YOUR_accountId_PARAMETER"
+    url = 'https://api.yapily.com/accounts' + account_id + '/transactions'
+    headers = {
+        "consent": "string",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are all your transactions brought by Yapily"
+    response_body['results'] = data
+    return response_body, 200
+
+
 @api.route('/sources', methods=['GET', 'POST'])
 @jwt_required()
 def sources():
@@ -53,8 +197,7 @@ def sources():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Sources(id = data.get('id'),
-                      name = data.get('name'),
+        row = Sources(name = data.get('name'),
                       type_source = data.get('type_source'),
                       amount = data.get('amount'),
                       user_id = data.get('user_id'))
@@ -125,8 +268,7 @@ def categories():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Categories(id = data.get('id'),
-                         type_category = data.get('type_category'),
+        row = Categories(type_category = data.get('type_category'),
                          name = data.get('name'),
                          description = data.get('description'),
                          user_id = data.get('user_id'))
@@ -301,8 +443,7 @@ def budgets():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Budgets(id = data.get('id'),
-                      budget_amount = data.get('budget_amount'),
+        row = Budgets(budget_amount = data.get('budget_amount'),
                       target_period = data.get('target_period'),
                       total_expense = data.get('total_expense'),
                       category_id = data.get('category_id'))
@@ -342,4 +483,4 @@ def budget(id):
         db.session.commit()
         response_body['message'] = "The budget was deleted (DELETE)"
         response_body['results'] = {}
-        return response_body, 200 
+        return response_body, 200
