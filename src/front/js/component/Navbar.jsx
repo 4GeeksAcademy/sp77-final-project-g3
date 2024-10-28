@@ -6,6 +6,7 @@ import { useAuth } from "/workspaces/sp77-final-project-g3/src/contexts/authCont
 import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth"; // Import sign-out function
 
 export const Navbar = () => {
+
     const { currentUser } = useAuth(); // Access current user state
 
     const handleLogout = async () => {
