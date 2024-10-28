@@ -23,6 +23,22 @@ def handle_hello():
     return response_body, 200
 
 
+@api.route('/signup', methods=['POST'])
+def signup():
+    response_body = {}
+    data = request.json
+    new_user = Users(email = data.get('email'),
+                     password = data.get('password'),
+                     first_name = data.get('first_name'),
+                     last_name = data.get('last_name'),
+                     phone_number = data.get('phone_number'))
+    db.session.add(new_user)
+    db.session.commit()
+    response_body['message'] = "Registration succeeded!"
+    response_body['results'] = new_user.serialize()
+    return response_body, 200
+
+
 @api.route('/login', methods=['POST'])
 def login():
     response_body = {}
@@ -40,6 +56,38 @@ def login():
     return response_body, 200
 
 
+@api.route('/profile', methods=['PUT'])
+@jwt_required()
+def profile():
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
+    data = request.json
+    row.email = data.get('email')
+    row.first_name = data.get('first_name')
+    row.last_name = data.get('last_name')
+    row.phone_number = data.get('phone_number')
+    row.country = data.get('country')
+    row.photo_url = data.get('photo_url')
+    db.session.commit()
+    response_body['message'] = "Profile updated!"
+    response_body['results'] = row.serialize()
+    return response_body, 200
+
+
+@api.route('/remove-account', methods=['DELETE'])
+@jwt_required()
+def remove_account():
+    response_body = {}
+    current_user = get_jwt_identity()
+    account = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
+    db.session.delete(account)
+    db.session.commit()
+    response_body['message'] = "Your account was successfully removed!"
+    response_body['results'] = {}
+    return response_body, 200
+
+
 @api.route('/sources', methods=['GET', 'POST'])
 @jwt_required()
 def sources():
@@ -53,8 +101,7 @@ def sources():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Sources(id = data.get('id'),
-                      name = data.get('name'),
+        row = Sources(name = data.get('name'),
                       type_source = data.get('type_source'),
                       amount = data.get('amount'),
                       user_id = data.get('user_id'))
@@ -125,8 +172,7 @@ def categories():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Categories(id = data.get('id'),
-                         type_category = data.get('type_category'),
+        row = Categories(type_category = data.get('type_category'),
                          name = data.get('name'),
                          description = data.get('description'),
                          user_id = data.get('user_id'))
@@ -301,8 +347,7 @@ def budgets():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Budgets(id = data.get('id'),
-                      budget_amount = data.get('budget_amount'),
+        row = Budgets(budget_amount = data.get('budget_amount'),
                       target_period = data.get('target_period'),
                       total_expense = data.get('total_expense'),
                       category_id = data.get('category_id'))
@@ -342,4 +387,4 @@ def budget(id):
         db.session.commit()
         response_body['message'] = "The budget was deleted (DELETE)"
         response_body['results'] = {}
-        return response_body, 200 
+        return response_body, 200
