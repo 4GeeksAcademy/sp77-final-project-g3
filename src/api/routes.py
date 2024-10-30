@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from api.models import db, Users, Sources, Balances, Categories, Transactions, FixedExpenses, Budgets
+from api.models import db, Users, Institutions, Sources, Balances, Categories, Transactions, FixedExpenses, Budgets
 from datetime import datetime, timezone
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -103,14 +103,21 @@ def institutions():
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
         return response_body, 400
-    data = response.json()
-    response_body['message'] = "These are the available institutions in the app"
-    response_body['results'] = data.get('institutions')
+    institutions_list = response.json()
+    data = institutions_list.get('data')
+    new_institution = Institutions(name=data['name'],
+                                   code=data['id'])
+    db.session.add(new_institution)
+    db.session.commit()
+    rows = db.session.execute(db.select(Institutions)).scalars()
+    result = [row.serialize() for row in rows]
+    response_body['message'] = "These are the available institutions"
+    response_body['results'] = result
     return response_body, 200
 
 
 @api.route('/account-auth-requests', methods=['POST'])
-def account_auth_requests():
+def account_auth_requests(id):
     response_body = {}
     url = 'https://api.yapily.com/account-auth-requests'
     payload = {
@@ -119,10 +126,7 @@ def account_auth_requests():
         "callback": "https://display-parameters.com/"
     }
     headers = {
-        "Content-Type": "application/json;charset=UTF-8",
-        "psu-id": "string",
-        "psu-corporate-id": "string",
-        "psu-ip-address": "string"
+        "Content-Type": "application/json;charset=UTF-8"
     }
     query = {
         "raw": "true"
@@ -132,6 +136,10 @@ def account_auth_requests():
         response_body['message'] = "Something went wrong"
         return response_body, 400
     data = response.json()
+    institution_consent = data.get('data').get('institutionConsentId')
+    consent = Institutions(consent=institution_consent)
+    db.session.add(consent)
+    db.session.commit()
     response_body['message'] = "You received authorization"
     response_body['results'] = data
     return response_body, 200
@@ -142,10 +150,7 @@ def accounts():
     response_body = {}
     url = 'https://api.yapily.com/accounts'
     headers = {
-        "consent": "string",
-        "psu-id": "string",
-        "psu-corporate-id": "string",
-        "psu-ip-address": "string"
+        "consent": "string"
     }
     query = {
         "raw": "true"
@@ -161,15 +166,12 @@ def accounts():
 
 
 @api.route('/yapily-transactions', methods=['GET'])
-def yapily_transactions():
+def yapily_transactions(id):
     response_body = {}
     account_id = "YOUR_accountId_PARAMETER"
     url = 'https://api.yapily.com/accounts' + account_id + '/transactions'
     headers = {
-        "consent": "string",
-        "psu-id": "string",
-        "psu-corporate-id": "string",
-        "psu-ip-address": "string"
+        "consent": "string"
     }
     query = {
         "raw": "true"

@@ -28,6 +28,22 @@ class Users(db.Model):
                 'photo_url': self.photo_url}
 
 
+class Institutions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    code = db.Column(db.String(80), unique=True, nullable=False)
+    consent = db.Column(db.String(80), unique=True, nullable=True)
+
+    def _repr_(self):
+        return f'<Institution {self.name}>'
+    
+    def serialize(self):
+        return {'id': self.id,
+                'name': self.name,
+                'code': self.code,
+                'consent': self.consent}
+
+
 class Sources(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), unique=False, nullable=False)
