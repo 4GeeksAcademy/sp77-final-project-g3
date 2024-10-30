@@ -7,16 +7,16 @@ import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth";
 
 export const Navbar = () => {
   
-    const { currentUser } = useAuth(); // Access current user state
-
+    const { currentUser } = useAuth(); 
     const handleLogout = async () => {
         try {
-            await doSignOut(); // Firebase sign-out
+            await doSignOut();
             console.log("User logged out");
         } catch (error) {
             console.error("Error logging out:", error.message);
         }
     };
+
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light" aria-label="Offcanvas navbar large" style={{ backgroundColor: '#F9D423' }}>
@@ -34,6 +34,14 @@ export const Navbar = () => {
                     </div>
                     <div className="offcanvas-body">
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li>
+                                {currentUser && (
+                                    <Link to="/dashboard">
+                                        <button id="boton-logout" className="btn fw-bold">
+                                            dashboard
+                                        </button>
+                                    </Link>)}
+                            </li>
                             <li className="nav-item">
                                 <Link className="nav-link fw-bold" to="/">
                                     Home
