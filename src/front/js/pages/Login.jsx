@@ -13,6 +13,7 @@ export const Login = () => {
     // State for Login/Register
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [visible, setVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [isRegistering, setIsRegistering] = useState(false);
 
@@ -59,10 +60,10 @@ export const Login = () => {
                     email,
                     first_name: firstName,
                     last_name: lastName,
-                    phone_number: phoneNumber,
+                    phone_number: phoneNumber
                 });
                 
-                navigate("/dashboard");
+                navigate("/profile");
             } else {
                 // Login existing user
                 await doSignInWithEmailAndPassword(email, password);
@@ -97,52 +98,6 @@ export const Login = () => {
             setErrorMessage(error.message);
         }
     };
-
-    // Profile Completion Form Submission
-    const handleProfileCompletion = async (e) => {
-        e.preventDefault();
-        try {
-            if (currentUser && currentUser.uid) {  // Ensure currentUser and uid are defined
-                await updateDoc(doc(db, "users", currentUser.uid), {
-                    first_name: firstName,
-                    last_name: lastName,
-                    phone_number: phoneNumber,
-                });
-                navigate("/dashboard");
-            } else {
-                console.log("Unable to update profile: UID not found.");
-            }
-        } catch (error) {
-            setErrorMessage(error.message);
-        }
-    };
-
-    // Conditionally Render Profile Completion or Login/Register Form
-    if (isProfileComplete) {
-        return (
-            <div className="d-flex justify-content-center align-items-center">
-                <div className="container-flex mt-5">
-                    <form onSubmit={handleProfileCompletion}>
-                        <h2>Complete Your Profile</h2>
-                        <div className="form-outline mb-4">
-                            <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-                            <label>First Name</label>
-                        </div>
-                        <div className="form-outline mb-4">
-                            <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-                            <label>Last Name</label>
-                        </div>
-                        <div className="form-outline mb-4">
-                            <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
-                            <label>Phone Number</label>
-                        </div>
-                       
-                        <button type="submit" className="btn btn-primary">Save Profile</button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="d-flex justify-content-center align-items-center">
@@ -183,27 +138,12 @@ export const Login = () => {
                             <label>Email</label>
                         </div>
                         <div className="form-outline mb-4">
-                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" required />
+                            <input type={visible ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} className="form-control" required />
                             <label>Password</label>
+                            <div style={{ position: 'relative', left: '88%', transform: 'translateY(-235%)', cursor: 'pointer' }} onClick={() => setVisible(!visible)}>
+                                {visible ? <i className="fas fa-eye-slash"></i> : <i className="fas fa-eye"></i>}
+                            </div>
                         </div>
-
-                        {/* Show additional fields when registering */}
-                        {isRegistering && (
-                            <>
-                                <div className="form-outline mb-4">
-                                    <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" required />
-                                    <label>First Name</label>
-                                </div>
-                                <div className="form-outline mb-4">
-                                    <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" required />
-                                    <label>Last Name</label>
-                                </div>
-                                <div className="form-outline mb-4">
-                                    <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} className="form-control" />
-                                    <label>Phone Number</label>
-                                </div>
-                            </>
-                        )}
                         <div className="d-flex justify-content-center">
                         <button type="submit" className="btn btn-primary btn-block mb-4">
                             {isRegistering ? "Sign up" : "Sign in"}
