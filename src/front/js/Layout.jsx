@@ -9,11 +9,17 @@ import { Footer } from "./component/Footer.jsx";
 import { Sidebar } from "./component/Sidebar.jsx";
 // Custom pages / views
 import { Home } from "./pages/Home.jsx";
-import { Demo } from "./pages/Demo.jsx";
-import { Single } from "./pages/Single.jsx";
+import { Dashboard } from "./pages/Dashboard.jsx";
 import { Login } from "./pages/Login.jsx";
+import { Faq } from "./pages/Faq.jsx";
+import { Transactions } from "./pages/Transactions.jsx"
+import { Budgets } from "./pages/Budgets.jsx"
+import { Balance } from "./pages/Balance.jsx"
+import { Connections } from "./pages/Connections.jsx"
+import { Guide } from "./pages/Guide.jsx"
 import { Contact } from "./pages/Contact.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
+
 
 // Create your first component
 const Layout = () => {
@@ -44,33 +50,64 @@ const Layout = () => {
                             </>
                         }
                         />
+                        <Route path="/faq" element={
+                            <>
+                                <Navbar />
+                                <Faq />
+                                <Footer />
+                            </>
+                        }
+                        />
+                        <Route path="/contact" element={
+                            <>
+                                <Navbar />
+                                <Contact />
+                                <Footer />
+                            </>
+                        }
+                        />
                         {/* Otras rutas con solo Sidebar */}
-                        <Route path="/demo" element={
+                        <Route path="/dashboard" element={
                             <div className="d-flex">
                                 <Sidebar />
-                                <Demo />
+                                <Dashboard />
                             </div>
                         }
                         />
-                        <Route path="/single/:theid" element={
+                        <Route path="/transactions" element={
                             <div className="d-flex">
                                 <Sidebar />
-                                <Single />
+                                <Transactions />
                             </div>
                         }
                         />
-                        <Route
-                            path="/contact"
-                            element={
-                                <div className="d-flex  min-vh-100">
-                                    <div className="col-3">
-                                        <Sidebar />
-                                    </div>
-                                    <div className="col-9">
-                                        <Contact />
-                                    </div>
-                                </div>
-                            }
+                        <Route path="/budgets" element={
+                            <div className="d-flex">
+                                <Sidebar />
+                                <Budgets />
+                            </div>
+                        }
+                        />
+                        <Route path="/balance" element={
+                            <div className="d-flex">
+                                <Sidebar />
+                                <Balance />
+                            </div>
+                        }
+                        />
+                        <Route path="/connections" element={
+                            <div className="d-flex">
+                                <Sidebar />
+                                <Connections />
+                            </div>
+                        }
+                        />
+                        <Route path="/guide" element={
+                            <div className="d-flex">
+                                <Sidebar />
+                                <Guide />
+                            </div>
+                        }
                         />
                         <Route path="*" element={<h1>Not found!</h1>} />
                     </Routes>

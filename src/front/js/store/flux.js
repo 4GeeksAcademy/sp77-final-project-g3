@@ -1,8 +1,9 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
+			user: '',
 			message: null,
-			host: `https://organic-potato-jjrrj747gq993j799-3001.app.github.dev/`,
+			host: ``,
 			user: '',
 			email: '',
 			isLogged: true,
@@ -15,18 +16,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 
 		actions: {
-			getToken: () => {
-				let token = getStore().token;  // Intenta obtener el token del store
-				if (!token) {
-					// Si no está en el store, intenta obtenerlo del localStorage
-					token = localStorage.getItem("jwt_token");
-					if (token) {
-						// Si se encuentra en localStorage, guárdalo en el store para reutilización
-						setStore({ token });
-					}
-				}
-				return token;
-			},
 			// actions for ExpenseVue
 			is_Logged: async () => {
 				const uri = ``
