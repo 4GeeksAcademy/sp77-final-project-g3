@@ -18,6 +18,8 @@ import { Balance } from "./pages/Balance.jsx"
 import { Connections } from "./pages/Connections.jsx"
 import { Guide } from "./pages/Guide.jsx"
 import { Contact } from "./pages/Contact.jsx";
+import { AuthProvider } from "../../contexts/authContext/index.jsx";
+
 
 
 // Create your first component
@@ -28,7 +30,7 @@ const Layout = () => {
     if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
-        <div>
+        <AuthProvider>
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Routes>
@@ -112,7 +114,7 @@ const Layout = () => {
                     </Routes>
                 </ScrollToTop>
             </BrowserRouter>
-        </div>
+        </AuthProvider>
     );
 };
 

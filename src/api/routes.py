@@ -9,11 +9,18 @@ from datetime import datetime, timezone
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+from dotenv import load_dotenv
+import os
 import requests
 
 
 api = Blueprint('api', __name__)
 CORS(api)  # Allow CORS requests to this API
+load_dotenv()
+
+
+yapily_id = os.getenv('YAPILY_ID')
+yapily_secret = os.getenv('YAPILY_SECRET')
 
 
 @api.route('/hello', methods=['GET'])
@@ -85,6 +92,95 @@ def remove_account():
     db.session.commit()
     response_body['message'] = "Your account was successfully removed!"
     response_body['results'] = {}
+    return response_body, 200
+
+
+@api.route('/institutions', methods=['GET'])
+def institutions():
+    response_body = {}
+    url = 'https://api.yapily.com/institutions'
+    response = requests.get(url, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are the available institutions in the app"
+    response_body['results'] = data.get('institutions')
+    return response_body, 200
+
+
+@api.route('/account-auth-requests', methods=['POST'])
+def account_auth_requests():
+    response_body = {}
+    url = 'https://api.yapily.com/account-auth-requests'
+    payload = {
+        "applicationUserId": "string",
+        "institutionId": "modelo-sandbox",
+        "callback": "https://display-parameters.com/"
+    }
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, json=payload, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "You received authorization"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/accounts', methods=['GET'])
+def accounts():
+    response_body = {}
+    url = 'https://api.yapily.com/accounts'
+    headers = {
+        "consent": "string",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are your accounts registered in Yapily"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/yapily-transactions', methods=['GET'])
+def yapily_transactions():
+    response_body = {}
+    account_id = "YOUR_accountId_PARAMETER"
+    url = 'https://api.yapily.com/accounts' + account_id + '/transactions'
+    headers = {
+        "consent": "string",
+        "psu-id": "string",
+        "psu-corporate-id": "string",
+        "psu-ip-address": "string"
+    }
+    query = {
+        "raw": "true"
+    }
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are all your transactions brought by Yapily"
+    response_body['results'] = data
     return response_body, 200
 
 
