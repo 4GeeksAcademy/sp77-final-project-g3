@@ -47,3 +47,21 @@
     height: 200px; /* Ajusta la altura a lo que necesites */
     width: 100%; /* Ocupa el 100% del ancho del contenedor */
 }
+
+.accordion-button.collapsed,
+.accordion-button {
+    color: #E2E8F0;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #2D3748;
+    color: #E2E8F0; 
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(1);
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0) invert(1);
+}

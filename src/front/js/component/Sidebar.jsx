@@ -1,10 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext.js";
+import { useContext } from "react";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
 
-export const Sidebar = () => (
+export const Sidebar = () => {
+    const { store } = useContext(Context)
+    return (
     <>
         <div className="bg-warning d-flex flex-column flex-shrink-0" style={{ width: '250px', height: '100%' }}>
             <Link to="/" className="navbar-brand">
@@ -42,12 +46,14 @@ export const Sidebar = () => (
                         Balance
                     </Link>
                 </li>
+                {/* 
                 <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/fixed-expenses">
                         <i className="fa-solid fa-file-invoice bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                         Fixed Expenses
                     </Link>
                 </li>
+                */}
                 <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/connections">
                         <i className="fa-solid fa-circle-nodes bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
@@ -77,7 +83,7 @@ export const Sidebar = () => (
             <div className="dropdown mb-3 ms-2">
                 <a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src={userImg} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
-                    <strong className="user-settings">User</strong>
+                    <strong className="user-settings">{store.isLoged ? `${store.user}` : ''}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li><a className="dropdown-item" href="#">Profile</a></li>
@@ -90,4 +96,5 @@ export const Sidebar = () => (
             </div>
         </div>
     </>
-);
+      );
+};

@@ -1,9 +1,9 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
+			user: '',
 			message: null,
 			host: ``,
-			username: '',
 			email: '',
 			isLogged: true,
 			transactions: [],
@@ -14,6 +14,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 
 		actions: {
+			login: async (dataToSend) => {
+				const uri = `${process.env.BACKEND_URL}/api/login`;
+				const options = {
+					method: 'POST',
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify(dataToSend)
+				}
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error', response.status, response.statusText);
+					return;
+				}
+				const data = await response.json()
+				console.log(data)
+				localStorage.setItem('token', data.access_token)
+				localStorage.setItem('user', JSON.stringify(data.results))
+				setStore({ isLoged: true, user: data.results.email })
+			},
 			exampleFunction: () => {getActions().changeColor(0, "green");},
 			getMessage: async () => {
 				const uri = `${process.env.BACKEND_URL}/api/hello`

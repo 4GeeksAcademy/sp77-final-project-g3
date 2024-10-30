@@ -7,10 +7,14 @@ export const Contact = () => {
 	const { store, actions } = useContext(Context);
 
 	return (
-        <div className="d-flex justify-content-center align-items-center mt-5">
-            <div className="container-flex mt-5">
+        <>
+        <div className="container text-center mt-4">
+        <h1>Contact</h1>
+        <p>We’re here to help! Whether you have questions, feedback, or need support, feel free to reach out. Our team is dedicated to providing you with the assistance you need as quickly as possible.</p>
+        </div>
+        <div className="d-flex justify-content-center align-items-center">
+            <div className="container-flex mt-3">
                         <form>
-                            <p className="text-center"> Contact Us</p>
                             <div className="form-outline mb-4">
                                 <label className="form-label" htmlFor="registerName">
                                     First Name
@@ -38,5 +42,6 @@ export const Contact = () => {
                         </form>
                     </div>
                 </div>
+                </>
     );
 };
