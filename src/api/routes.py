@@ -120,7 +120,7 @@ def institutions():
 
 
 @api.route('/account-auth-requests', methods=['POST'])
-def account_auth_requests(id):
+def account_auth_requests():
     response_body = {}
     url = 'https://api.yapily.com/account-auth-requests'
     payload = {
@@ -165,7 +165,7 @@ def accounts():
 
 
 @api.route('/yapily-transactions', methods=['GET'])
-def yapily_transactions(id):
+def yapily_transactions():
     response_body = {}
     account_id = "YOUR_accountId_PARAMETER"
     url = 'https://api.yapily.com/accounts' + account_id + '/transactions'

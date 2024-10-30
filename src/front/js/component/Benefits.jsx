@@ -13,7 +13,7 @@ export const Benefits = () => {
 					</div>
 				</div>
 				<div className="col-md-6 mx-auto mb-3">
-					<div className="bg-success h-100 p-5 border rounded-3">
+					<div className="bg-dark h-100 p-5 border rounded-3">
 						<h3>Automatic Expense Tracking</h3>
 						<p>Forget about the hassle of manually logging every transaction. With our automatic expense tracking feature, you can easily monitor where your money is going. Expenses are categorized instantly, giving you full visibility into your spending habits without any extra effort.</p>
 					</div>
@@ -21,7 +21,7 @@ export const Benefits = () => {
 
 
 				<div className="col-md-6 mx-auto mb-3">
-					<div className="card h-100 p-5 bg-success rounded-3">
+					<div className="card h-100 p-5 bg-dark rounded-3">
 						<h3>Expense Analysis by Category</h3>
 						<p>Take a deep dive into your spending with detailed analysis by category. Whether it's groceries, entertainment, or bills, we break down your expenses so you can identify patterns and make informed decisions. Gain insights into areas where you can save and optimize your budget.</p>
 					</div>
@@ -40,7 +40,7 @@ export const Benefits = () => {
 					</div>
 				</div>
 				<div className="col-md-6 mx-auto mb-3">
-					<div className="card bg-success h-100 p-5 border rounded-3">
+					<div className="card bg-dark h-100 p-5 border rounded-3">
 						<h3>Comprehensive Financial Overview</h3>
 						<p>Get a clear and concise overview of your entire financial landscape. Our dashboard offers real-time data on your income, expenses, and account balances, giving you a complete picture of your financial health at a glance. Make well-informed decisions with up-to-date information at your fingertips.</p>
 					</div>
