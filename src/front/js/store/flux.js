@@ -2,8 +2,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
-			host: ``,
-			username: '',
+			host: `https://organic-potato-jjrrj747gq993j799-3001.app.github.dev/`,
+			user: '',
 			email: '',
 			isLogged: true,
 			transactions: [],
@@ -11,82 +11,72 @@ const getState = ({ getStore, getActions, setStore }) => {
 			balance: [],
 			connections: [],
 			fixed_Expenses: [],
+			token: ''
 		},
 
 		actions: {
-			exampleFunction: () => {getActions().changeColor(0, "green");},
-			getMessage: async () => {
-				const uri = `${process.env.BACKEND_URL}/api/hello`
-				const options = {
-					method: 'GET'
+			getToken: () => {
+				let token = getStore().token;  // Intenta obtener el token del store
+				if (!token) {
+					// Si no está en el store, intenta obtenerlo del localStorage
+					token = localStorage.getItem("jwt_token");
+					if (token) {
+						// Si se encuentra en localStorage, guárdalo en el store para reutilización
+						setStore({ token });
+					}
 				}
-				const response = await fetch(uri, options)
-				if (!response.ok) {
-					console.log("Error loading message from backend", response.status)
-					return
-				}
-				const data = await response.json()
-				setStore({ message: data.message })
-				return data;
-			},
-			changeColor: (index, color) => {
-				const store = getStore();  // Get the store
-				const demo = store.demo.map((element, i) => {
-					if (i === index) element.background = color;
-					return element;
-				});
-				setStore({ demo: demo });  // Reset the global store
+				return token;
 			},
 			// actions for ExpenseVue
 			is_Logged: async () => {
 				const uri = ``
-				const options =""
+				const options = ""
 			},
-			setCurrentUsername: (username) => { 
-				setStore({ username: username }) 
+			setCurrentuser: (user) => {
+				setStore({ user: user })
 			},
-			SaveUsername: (username) => {
-				const storedUsername = localStorage.getItem('username');
-				if (storedUsername) {
+			Saveuser: (user) => {
+				const storedUser = localStorage.getItem('user');
+				if (storedUser) {
 					try {
-						const localUsername = localStorage.getItem('username')
-						setStore({ username: localUsername })
+						const localuser = localStorage.getItem('user')
+						setStore({ user: localuser })
 					} catch (error) {
 						console.error('Error al analizar el nombre de usuario almacenado:', error);
-						setStore({ username: '' });
+						setStore({ user: '' });
 					}
 					return
 				}
-				setStore({ username: username })
-				localStorage.setItem('username', JSON.stringify(username))
+				setStore({ user: user })
+				localStorage.setItem('user', JSON.stringify(user))
 			},
-			clearUsername: () => {
-				setStore({ username: '' });
-				localStorage.removeItem('username');
+			clearuser: () => {
+				setStore({ user: '' });
+				localStorage.removeItem('user');
 			},
-			getEmail: (email) => { 
-				setStore({ email: email }) 
+			getEmail: (email) => {
+				setStore({ email: email })
 			},
 			saveEmail: (email) => {
-				const storedUsername = localStorage.getItem('email');
-				if (storedUsername) {
+				const storeduser = localStorage.getItem('email');
+				if (storeduser) {
 					try {
-						const localUsername = localStorage.getItem('email')
-						setStore({ email: localUsername })
+						const localuser = localStorage.getItem('email')
+						setStore({ email: localuser })
 					} catch (error) {
 						console.error('Error al analizar el email del usuario almacenado:', error);
 						setStore({ email: '' });
 					}
 					return
 				}
-				setStore({ emaile: username })
+				setStore({ emaile: user })
 				localStorage.setItem('email', JSON.stringify(email))
 			},
 			clearEmail: () => {
 				setStore({ email: '' });
 				localStorage.removeItem('email');
 			},
-			editUsername: async (id, dataToSend) => {
+			edituser: async (id, dataToSend) => {
 				const uri = ``;
 				const options = {
 					method: 'PUT',
@@ -100,8 +90,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log('Error:', response.status, response.statusText);
 					return
 				}
-				getActions().setCurrentUsername({});
-				getActions().getUsername();
+				getActions().setCurrentuser({});
+				getActions().getuser();
 			},
 			deleteUser: async (id) => {
 				const uri = ``;
@@ -113,23 +103,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log('Error:', response.status, response.statusText);
 					return
 				};
-				getActions().getUsername();
+				getActions().getuser();
 			},
-			setCurrentTransaction: (transaction) => { setStore({ transactions: transaction}) },
+			setCurrentTransaction: (transaction) => { setStore({ transactions: transaction }) },
 			getTransactions: async () => {
-				const uri = ``
-				// console.log('URI:', uri);
+				const uri = `${getStore().host}/transactions`;
+				const token = localStorage.getItem("jwt_token");
+
 				const options = {
 					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
+				try {
+					const response = await fetch(uri, options);
+
+					if (!response.ok) {
+						console.log('Error:', response.status, response.statusText);
+						return;
+					}
+
+					const data = await response.json();
+					console.log('Data:', data);  // Opcional: para verificar la data en consola
+
+					// Suponiendo que `data.results` contiene las transacciones
+					setStore({ transactions: data.results });
+				} catch (error) {
+					console.error("Fetch error:", error);
 				}
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				}
-				const data = await response.json();
-				// console.log('este es el data:', data);
-				setStore({ transactions: data.results });
 			},
 			createTransaction: async (loginData) => {
 				const uri = ``;
@@ -175,7 +179,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				getActions().getTransaction();
 			},
-			setCurrentBudget: (Budget) => { setStore({ Budget: Budget}) },
+			setCurrentBudget: (Budget) => { setStore({ Budget: Budget }) },
 			getBudget: async () => {
 				const uri = ``
 				// console.log('URI:', uri);
@@ -235,7 +239,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				getActions().getBudget();
 			},
-			setCurrentFixedExpenses: (fixed_Expenses) => { setStore({ fixed_Expenses: fixed_Expenses}) },
+			setCurrentFixedExpenses: (fixed_Expenses) => { setStore({ fixed_Expenses: fixed_Expenses }) },
 			getFixedExpenses: async () => {
 				const uri = ``
 				// console.log('URI:', uri);
@@ -278,7 +282,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				// console.log('este es el data:', data);
 				setStore({ Balance: data.results });
 			},
-			setCurrentConnections: (connections) => { setStore({ connections: connections}) },
+			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
 			getFixedExpenses: async () => {
 				const uri = ``
 				// console.log('URI:', uri);
@@ -313,4 +317,3 @@ const getState = ({ getStore, getActions, setStore }) => {
 };
 
 export default getState;
-
