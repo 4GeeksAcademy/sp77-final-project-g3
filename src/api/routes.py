@@ -105,9 +105,12 @@ def institutions():
         return response_body, 400
     institutions_list = response.json()
     data = institutions_list.get('data')
-    new_institution = Institutions(name=data['name'],
-                                   code=data['id'])
-    db.session.add(new_institution)
+    for institution_data in data:
+        saved_institution = db.session.execute(db.select(Institutions).where(Institutions.code == institution_data.get('id'))).scalar_one_or_none()
+        if not saved_institution:
+            new_institution = Institutions(name=institution_data.get('name'),
+                                           code=institution_data.get('id'))
+            db.session.add(new_institution)
     db.session.commit()
     rows = db.session.execute(db.select(Institutions)).scalars()
     result = [row.serialize() for row in rows]
@@ -136,10 +139,6 @@ def account_auth_requests(id):
         response_body['message'] = "Something went wrong"
         return response_body, 400
     data = response.json()
-    institution_consent = data.get('data').get('institutionConsentId')
-    consent = Institutions(consent=institution_consent)
-    db.session.add(consent)
-    db.session.commit()
     response_body['message'] = "You received authorization"
     response_body['results'] = data
     return response_body, 200

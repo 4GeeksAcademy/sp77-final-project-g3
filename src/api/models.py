@@ -12,7 +12,6 @@ class Users(db.Model):
     first_name = db.Column(db.String(80), unique=False, nullable=True)
     last_name = db.Column(db.String(80), unique=False, nullable=True)
     phone_number = db.Column(db.String(), unique=False, nullable=True)
-    country = db.Column(db.String(), unique=False, nullable=False)
     photo_url = db.Column(db.String(), unique=False, nullable=True)
 
     def __repr__(self):
@@ -24,7 +23,6 @@ class Users(db.Model):
                 'first_name': self.first_name,
                 'last_name': self.last_name,
                 'phone_number': self.phone_number,
-                'country': self.country,
                 'photo_url': self.photo_url}
 
 
