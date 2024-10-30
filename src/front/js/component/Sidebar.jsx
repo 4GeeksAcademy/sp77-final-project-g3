@@ -61,12 +61,6 @@ export const Sidebar = () => {
                     </Link>
                 </li>
                 <li className="mb-3 ms-2">
-                    <Link className="fw-bold sidebar-link" to="/guide">
-                        <i className="fa-solid fa-book bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                        Guide
-                    </Link>
-                </li>
-                <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/faq">
                         <i className="fa-solid fa-circle-question bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                         FAQ
@@ -83,11 +77,11 @@ export const Sidebar = () => {
             <div className="dropdown mb-3 ms-2">
                 <a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src={userImg} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
-                    <strong className="user-settings">{store.isLoged ? `${store.user}` : ''}</strong>
+                    <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a className="dropdown-item" href="#">Profile</a></li>
-                    <li><hr className="dropdown-divider" /></li>
+                <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                <li><hr className="dropdown-divider" /></li>
                     <li><a className="dropdown-item" href="#">Sign out</a></li>
                 </ul>
             </div>

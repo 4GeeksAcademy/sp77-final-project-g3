@@ -18,7 +18,7 @@ export const Login = () => {
         const dataToSend = { email, password }
         console.log(dataToSend);
         actions.login(dataToSend);
-        navigate('/dashboard')
+        navigate('/profile')
       }
       
     return (
