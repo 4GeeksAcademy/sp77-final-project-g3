@@ -114,8 +114,30 @@ def institutions():
     db.session.commit()
     rows = db.session.execute(db.select(Institutions)).scalars()
     result = [row.serialize() for row in rows]
-    response_body['message'] = "These are the available institutions"
+    response_body['message'] = "These are the available institutions!"
     response_body['results'] = result
+    return response_body, 200
+
+
+@api.route('/yapily-connection', methods=['POST'])
+@jwt_required()
+def yapily_connection():
+    response_body = {}
+    current_user = get_jwt_identity()
+    user = Users.query.filter_by(id=current_user['user_id']).first()
+    url = "https://api.yapily.com/users"
+    headers = {
+        "Content-Type": "application/json;charset=UTF-8"
+    }
+    response = requests.post(url, headers=headers, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        return response_body, 400
+    data = response.json()
+    app_id = data.get('applicationUserId')
+    user.yapily_id = app_id
+    db.session.commit()
+    response_body['message'] = "The connection with Yapily was created!"
     return response_body, 200
 
 
@@ -144,8 +166,11 @@ def account_auth_requests():
         response_body['message'] = "Something went wrong"
         return response_body, 400
     data = response.json()
-    response_body['message'] = "You received authorization"
-    response_body['results'] = data
+    consent = data.get('institutionConsentId')
+    institution.consent = consent
+    institution.user_id = user.id
+    db.session.commit()
+    response_body['message'] = "You received the authorization for this institution!"
     return response_body, 200
 
 
@@ -167,9 +192,22 @@ def accounts():
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
         return response_body, 400
-    data = response.json()
-    response_body['message'] = "These are your accounts registered in Yapily"
-    response_body['results'] = data
+    accounts_list = response.json()
+    data = accounts_list.get('data')
+    for account_data in data:
+        saved_source = db.session.execute(db.select(Sources).where(Sources.id == account_data.get('id'))).scalar_one_or_none()
+        if not saved_source:
+            new_source = Sources(id=account_data.get('id'),
+                                 name=institution.name,
+                                 type_source='bank account',
+                                 amount=account_data.get('balance'),
+                                 user_id=current_user.get('user_id'))
+            db.session.add(new_source)
+    db.session.commit()
+    rows = db.session.execute(db.select(Sources)).scalars()
+    result = [row.serialize() for row in rows]
+    response_body['message'] = f"Your accounts in {institution.name} were added to your sources successfully!"
+    response_body['results'] = result
     return response_body, 200
 
 
@@ -178,10 +216,12 @@ def accounts():
 def yapily_transactions():
     response_body = {}
     current_user = get_jwt_identity()
-    account_id = "YOUR_accountId_PARAMETER"
-    url = 'https://api.yapily.com/accounts' + account_id + '/transactions'
+    account_id = request.args.get('source_id')
+    source = Sources.query.filter_by(id=account_id).first()
+    institution = Institutions.query.filter_by(name=source.name, user_id=current_user.get('user_id')).first()
+    url = f'https://api.yapily.com/accounts/{account_id}/transactions'
     headers = {
-        "consent": "string"
+        "consent": institution.consent
     }
     query = {
         "raw": "true"
@@ -190,9 +230,22 @@ def yapily_transactions():
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
         return response_body, 400
-    data = response.json()
-    response_body['message'] = "These are all your transactions brought by Yapily"
-    response_body['results'] = data
+    transactions_list = response.json()
+    data = transactions_list.get('data')
+    for transaction_data in data:
+        saved_transaction = db.session.execute(db.select(Transactions).where(Transactions.id == transaction_data.get('id'))).scalar_one_or_none()
+        if not saved_transaction:
+            new_transaction = Transactions(id=transaction_data.get('id'),
+                                           amount=transaction_data.get('amount'),
+                                           description=transaction_data.get('description'),
+                                           date=transaction_data.get('date'),
+                                           source_id=account_id)
+            db.session.add(new_transaction)
+    db.session.commit()
+    rows = db.session.execute(db.select(Transactions)).scalars()
+    result = [row.serialize() for row in rows]
+    response_body['message'] = f"The transactions from the account {account_id} were added successfully!"
+    response_body['results'] = result
     return response_body, 200
 
 
