@@ -99,6 +99,14 @@ export const Login = () => {
         }
     };
 
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const dataToSend = { email, password }
+        console.log(dataToSend);
+        actions.login(dataToSend);
+        navigate('/profile')
+      }
+      
     return (
         <div className="d-flex justify-content-center align-items-center">
             <div className="container-flex mt-5">

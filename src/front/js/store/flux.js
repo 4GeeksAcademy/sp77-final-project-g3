@@ -22,18 +22,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 						"Content-Type": 'application/json'
 					},
 					body: JSON.stringify(dataToSend)
-				}
+				};
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error', response.status, response.statusText);
 					return;
 				}
-				const data = await response.json()
-				console.log(data)
-				localStorage.setItem('token', data.access_token)
-				localStorage.setItem('user', JSON.stringify(data.results))
-				setStore({ isLoged: true, user: data.results.email })
-			},
+				const data = await response.json();
+				console.log(data);
+			
+				localStorage.setItem('token', data.access_token);
+				localStorage.setItem('user', JSON.stringify(data.results));
+				setStore({ isLogged: true, user: data.results });
+			},			
 			exampleFunction: () => {getActions().changeColor(0, "green");},
 			getMessage: async () => {
 				const uri = `${process.env.BACKEND_URL}/api/hello`
@@ -328,6 +329,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ connections: data.results });
 			},
 			// comentario 
+			getUser: async () => {
+				try {
+					const response = await fetch("URL_DEL_BACKEND/user", {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							// Agrega autenticación si es necesario
+							"Authorization": `Bearer ${store.token}`,
+						},
+					});
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ user: data });
+					} else {
+						console.error("Error al obtener los datos del usuario:", response.statusText);
+					}
+				} catch (error) {
+					console.error("Error en la conexión al backend:", error);
+				}
+			}
 		}
 	};
 };
