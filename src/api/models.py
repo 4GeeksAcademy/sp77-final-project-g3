@@ -13,6 +13,7 @@ class Users(db.Model):
     last_name = db.Column(db.String(80), unique=False, nullable=True)
     phone_number = db.Column(db.String(), unique=False, nullable=True)
     photo_url = db.Column(db.String(), unique=False, nullable=True)
+    yapily_id = db.Column(db.String(), unique=True, nullable=True)
 
     def __repr__(self):
         return f'<User {self.id} - {self.email}>'
@@ -23,7 +24,8 @@ class Users(db.Model):
                 'first_name': self.first_name,
                 'last_name': self.last_name,
                 'phone_number': self.phone_number,
-                'photo_url': self.photo_url}
+                'photo_url': self.photo_url,
+                'yapily_id': self.yapily_id}
 
 
 class Institutions(db.Model):
@@ -31,6 +33,8 @@ class Institutions(db.Model):
     name = db.Column(db.String(120), unique=True, nullable=False)
     code = db.Column(db.String(80), unique=True, nullable=False)
     consent = db.Column(db.String(80), unique=True, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('institution_to', lazy='select'))
 
     def _repr_(self):
         return f'<Institution {self.name}>'
@@ -39,7 +43,8 @@ class Institutions(db.Model):
         return {'id': self.id,
                 'name': self.name,
                 'code': self.code,
-                'consent': self.consent}
+                'consent': self.consent,
+                'user_id': self.user_id}
 
 
 class Sources(db.Model):

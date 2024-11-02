@@ -120,12 +120,17 @@ def institutions():
 
 
 @api.route('/account-auth-requests', methods=['POST'])
+@jwt_required()
 def account_auth_requests():
     response_body = {}
+    current_user = get_jwt_identity()
+    user = Users.query.filter_by(id=current_user['user_id']).first()
+    institution_id = request.args.get('institution_id')
+    institution = Institutions.query.filter_by(id=institution_id).first()
     url = 'https://api.yapily.com/account-auth-requests'
     payload = {
-        "applicationUserId": "string",
-        "institutionId": "modelo-sandbox",
+        "applicationUserId": user.yapily_id,
+        "institutionId": institution.code,
         "callback": "https://display-parameters.com/"
     }
     headers = {
@@ -145,11 +150,15 @@ def account_auth_requests():
 
 
 @api.route('/accounts', methods=['GET'])
+@jwt_required()
 def accounts():
     response_body = {}
+    current_user = get_jwt_identity()
+    institution_id = request.args.get('institution_id')
+    institution = Institutions.query.filter_by(id=institution_id, user_id=current_user.get('user_id')).first()
     url = 'https://api.yapily.com/accounts'
     headers = {
-        "consent": "string"
+        "consent": institution.consent
     }
     query = {
         "raw": "true"
@@ -165,8 +174,10 @@ def accounts():
 
 
 @api.route('/yapily-transactions', methods=['GET'])
+@jwt_required()
 def yapily_transactions():
     response_body = {}
+    current_user = get_jwt_identity()
     account_id = "YOUR_accountId_PARAMETER"
     url = 'https://api.yapily.com/accounts' + account_id + '/transactions'
     headers = {
