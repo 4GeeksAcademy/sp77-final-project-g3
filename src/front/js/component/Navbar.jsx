@@ -2,8 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
-import { useAuth } from "/workspaces/sp77-final-project-g3/src/contexts/authContext/index.jsx";
-import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth"; // Import sign-out function
+import { useAuth } from "../../../contexts/authContext/index.jsx";
+import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
 
 export const Navbar = () => {
   

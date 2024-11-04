@@ -5,7 +5,7 @@ import { useContext } from "react";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
-import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth"; // Import sign-out function
+import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
 
 export const Sidebar = () => {
     const { store } = useContext(Context);
