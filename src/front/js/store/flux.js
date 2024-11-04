@@ -1,10 +1,9 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			user: '',
+			user: {},
 			message: null,
-			host: `https://organic-potato-jjrrj747gq993j799-3001.app.github.dev`,
-			user: '',
+			host: process.env.BACKEND_URL,
 			email: '',
 			isLogged: true,
 			transactions: [],
@@ -441,9 +440,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getConnections();
 				setStore({ connections: data.results });
 			},
-
-
-
 		}
 	};
 };
