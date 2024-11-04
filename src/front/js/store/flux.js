@@ -1,9 +1,9 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			user: '',
+			user: {},
 			message: null,
-			host: ``,
+			host: process.env.BACKEND_URL,
 			email: '',
 			isLogged: true,
 			transactions: [],
@@ -330,25 +330,46 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			// comentario 
 			getUser: async () => {
+                try {
+                    const response = await fetch(`${getStore().host}/users`, {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${getStore().access_token}`,
+                        },
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setStore({ user: data });
+                    } else {
+                        console.error("Error al obtener los datos del usuario:", response.statusText);
+                    }
+                } catch (error) {
+                    console.error("Error en la conexión al backend:", error);
+                }
+            },
+			updateUser: async (id, userData) => {
 				try {
-					const response = await fetch("URL_DEL_BACKEND/user", {
-						method: "GET",
+					const response = await fetch(`${getStore().host}/users/${id}`, {
+						method: "PUT",
 						headers: {
 							"Content-Type": "application/json",
-							// Agrega autenticación si es necesario
-							"Authorization": `Bearer ${store.token}`,
+							"Authorization": `Bearer ${getStore().access_token}`,
 						},
+						body: JSON.stringify(userData),
 					});
-					if (response.ok) {
-						const data = await response.json();
-						setStore({ user: data });
-					} else {
-						console.error("Error al obtener los datos del usuario:", response.statusText);
+					if (!response.ok) {
+						console.error("Error actualizando el usuario:", response.statusText);
+						return false;
 					}
+					const updatedUser = await response.json();
+					setStore({ user: updatedUser });
+					return true;
 				} catch (error) {
-					console.error("Error en la conexión al backend:", error);
+					console.error("Error en la actualización:", error);
+					return false;
 				}
-			}
+			},												
 		}
 	};
 };

@@ -7,15 +7,14 @@ import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
 
 export const Sidebar = () => {
-    const { store } = useContext(Context)
+    const { store } = useContext(Context);
     return (
-    <>
-        <div className="bg-warning d-flex flex-column flex-shrink-0" style={{ width: '250px', height: '100%' }}>
+        <div className="sidebar-container">
             <Link to="/" className="navbar-brand">
                 <img className="mb-4 mt-2 mx-5" height="80" src={logoExpenseVue} alt="Logo ExpenseVue" />
             </Link>
             <hr />
-            <ul className="nav nav-pills flex-column mb-auto list-unstyled flex-grow-1">
+            <ul className="nav nav-pills flex-column mb-auto list-unstyled sidebar-content">
                 <li className="nav-item mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/">
                         <i className="fa-solid fa-home bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
@@ -46,14 +45,6 @@ export const Sidebar = () => {
                         Balance
                     </Link>
                 </li>
-                {/* 
-                <li className="mb-3 ms-2">
-                    <Link className="fw-bold sidebar-link" to="/fixed-expenses">
-                        <i className="fa-solid fa-file-invoice bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                        Fixed Expenses
-                    </Link>
-                </li>
-                */}
                 <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/connections">
                         <i className="fa-solid fa-circle-nodes bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
@@ -80,15 +71,14 @@ export const Sidebar = () => {
                     <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-                <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
-                <li><hr className="dropdown-divider" /></li>
+                    <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                    <li><hr className="dropdown-divider" /></li>
                     <li><a className="dropdown-item" href="#">Sign out</a></li>
                 </ul>
             </div>
-            <div className="mt-auto ms-2 mb-3">
+            <div className="sidebar-footer ms-2 mb-3">
                 <span>© ExpenseVue</span>
             </div>
         </div>
-    </>
-      );
+    );
 };
