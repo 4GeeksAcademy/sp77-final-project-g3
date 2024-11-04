@@ -12,8 +12,8 @@ class Users(db.Model):
     first_name = db.Column(db.String(80), unique=False, nullable=True)
     last_name = db.Column(db.String(80), unique=False, nullable=True)
     phone_number = db.Column(db.String(), unique=False, nullable=True)
-    country = db.Column(db.String(), unique=False, nullable=False)
     photo_url = db.Column(db.String(), unique=False, nullable=True)
+    yapily_id = db.Column(db.String(), unique=True, nullable=True)
 
     def __repr__(self):
         return f'<User {self.id} - {self.email}>'
@@ -24,8 +24,27 @@ class Users(db.Model):
                 'first_name': self.first_name,
                 'last_name': self.last_name,
                 'phone_number': self.phone_number,
-                'country': self.country,
-                'photo_url': self.photo_url}
+                'photo_url': self.photo_url,
+                'yapily_id': self.yapily_id}
+
+
+class Institutions(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), unique=True, nullable=False)
+    code = db.Column(db.String(80), unique=True, nullable=False)
+    consent = db.Column(db.String(80), unique=True, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('institution_to', lazy='select'))
+
+    def _repr_(self):
+        return f'<Institution {self.name}>'
+    
+    def serialize(self):
+        return {'id': self.id,
+                'name': self.name,
+                'code': self.code,
+                'consent': self.consent,
+                'user_id': self.user_id}
 
 
 class Sources(db.Model):

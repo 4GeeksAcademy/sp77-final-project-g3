@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useState, useContext } from "react";
+import { Context } from "../store/appContext.js";
 import { Link } from "react-router-dom";
-
-
+import { useNavigate } from "react-router-dom";
 export const Login = () => {
+    const { actions } = useContext(Context)
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+    const handleEmail = (event) => setEmail(event.target.value)
+    const handlePassword = (event) => setPassword(event.target.value)
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const dataToSend = { email, password }
+        console.log(dataToSend);
+        actions.login(dataToSend);
+        navigate('/profile')
+    }
     return (
         <div className="d-flex justify-content-center align-items-center">
             <div className="container-flex mt-5">
@@ -21,7 +34,7 @@ export const Login = () => {
                 </ul>
                 <div className="tab-content">
                     <div className="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-                        <form>
+                        <form onSubmit={handleSubmit} >
                             <div className="text-center mb-3">
                                 <p>Sign in with:</p>
                                 <button type="button" className="btn btn-link btn-floating mx-1">
@@ -39,13 +52,13 @@ export const Login = () => {
                             </div>
                             <p className="text-center">or:</p>
                             <div className="form-outline mb-4">
-                                <input type="email" id="loginName" className="form-control" />
+                                <input type="email" id="loginName" required aria-label="Email" value={email} onChange={handleEmail} className="form-control" />
                                 <label className="form-label" htmlFor="loginName">
                                     Email
                                 </label>
                             </div>
                             <div className="form-outline mb-4">
-                                <input type="password" id="loginPassword" className="form-control" />
+                                <input type="password" id="loginPassword" required value={password} onChange={handlePassword} className="form-control" />
                                 <label className="form-label" htmlFor="loginPassword" >
                                     Password
                                 </label>
@@ -53,7 +66,7 @@ export const Login = () => {
                             <div className="row mb-4">
                                 <div className="col-md-6 d-flex justify-content-center">
                                     <div className="form-check mb-3 mb-md-0 custom-checkbox">
-                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked  />
+                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked />
                                         <label className="form-check-label " htmlFor="loginCheck" >
                                             Remember me
                                         </label>
@@ -63,7 +76,7 @@ export const Login = () => {
                                     <Link to="/forgot-password" style={{ color: '#2D3748' }}>Lost password?</Link>
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-block mb-4" style={{ backgroundColor: '#2D3748', color: '#E2E8F0'}}>
+                            <button type="submit" className="btn btn-block mb-4" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
                                 Sign in
                             </button>
                         </form>

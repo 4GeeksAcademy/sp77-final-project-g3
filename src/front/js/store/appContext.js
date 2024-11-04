@@ -30,7 +30,15 @@ const injectContext = PassedComponent => {
 		  store, instead use actions, like this:
 		*/
 		useEffect(() => {
-			state.actions.getMessage();  // Calling this function from the flux.js actions
+			state.actions.getToken();
+			state.actions.getTransactions();
+			state.actions.getBudgets();
+			state.actions.getFixedExpenses();
+			state.actions.getSources();
+			state.actions.getBalance();
+			state.actions.getCategories();
+
+			// Calling this function from the flux.js actions
 		}, []);
 
 		// The initial value for the context is not null anymore, but the current state of this component,

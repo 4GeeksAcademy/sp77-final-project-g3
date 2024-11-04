@@ -1,17 +1,34 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext.js";
+import { useContext } from "react";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
+import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth"; // Import sign-out function
 
-export const Sidebar = () => (
-    <>
-        <div className="bg-warning d-flex flex-column flex-shrink-0" style={{ width: '250px', height: '100%' }}>
+export const Sidebar = () => {
+    const { store } = useContext(Context);
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await doSignOut();
+            console.log("User logged out");
+            navigate('/')
+
+        } catch (error) {
+            console.error("Error logging out:", error.message);
+        }
+    };
+
+    return (
+        <div className="sidebar-container">
             <Link to="/" className="navbar-brand">
                 <img className="mb-4 mt-2 mx-5" height="80" src={logoExpenseVue} alt="Logo ExpenseVue" />
             </Link>
             <hr />
-            <ul className="nav nav-pills flex-column mb-auto list-unstyled flex-grow-1">
+            <ul className="nav nav-pills flex-column mb-auto list-unstyled sidebar-content">
                 <li className="nav-item mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/">
                         <i className="fa-solid fa-home bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
@@ -43,21 +60,9 @@ export const Sidebar = () => (
                     </Link>
                 </li>
                 <li className="mb-3 ms-2">
-                    <Link className="fw-bold sidebar-link" to="/fixed-expenses">
-                        <i className="fa-solid fa-file-invoice bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                        Fixed Expenses
-                    </Link>
-                </li>
-                <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/connections">
                         <i className="fa-solid fa-circle-nodes bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                         Connections
-                    </Link>
-                </li>
-                <li className="mb-3 ms-2">
-                    <Link className="fw-bold sidebar-link" to="/guide">
-                        <i className="fa-solid fa-book bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                        Guide
                     </Link>
                 </li>
                 <li className="mb-3 ms-2">
@@ -77,17 +82,17 @@ export const Sidebar = () => (
             <div className="dropdown mb-3 ms-2">
                 <a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src={userImg} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
-                    <strong className="user-settings">User</strong>
+                    <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-                    <li><a className="dropdown-item" href="#">Profile</a></li>
+                    <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li><a className="dropdown-item" href="#">Sign out</a></li>
+                    <li><a className="dropdown-item" onClick={handleLogout} href="#">Sign out</a></li>
                 </ul>
             </div>
-            <div className="mt-auto ms-2 mb-3">
+            <div className="sidebar-footer ms-2 mb-3">
                 <span>© ExpenseVue</span>
             </div>
         </div>
-    </>
-);
+    );
+};
