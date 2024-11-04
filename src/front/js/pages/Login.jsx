@@ -12,6 +12,10 @@ export const Login = () => {
 
     const handleEmail = (event) => setEmail(event.target.value)
     const handlePassword = (event) => setPassword(event.target.value)
+    const handleGetToken = (event) => {
+        actions.getToken();
+        console.log("Token obtenido al hacer clic en Home");
+    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -19,15 +23,15 @@ export const Login = () => {
         console.log(dataToSend);
         actions.login(dataToSend);
         navigate('/dashboard')
-      }
-      
+    }
+
     return (
         <div className="d-flex justify-content-center align-items-center">
             <div className="container-flex mt-5">
                 {/* Pills navs */}
                 <ul className="nav nav-pills nav-justified mb-3 " id="ex1" role="tablist"  >
                     <li className="nav-item" role="presentation" >
-                        <a className="nav-link active" id="tab-login" data-bs-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true">
+                        <a className="nav-link active" id="tab-login" data-bs-toggle="pill" href="#pills-login" role="tab" aria-controls="pills-login" aria-selected="true" onClick={handleGetToken}>
                             Login
                         </a>
                     </li>
@@ -39,7 +43,7 @@ export const Login = () => {
                 </ul>
                 <div className="tab-content">
                     <div className="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
-                        <form  onSubmit={handleSubmit} >
+                        <form onSubmit={handleSubmit} >
                             <div className="text-center mb-3">
                                 <p>Sign in with:</p>
                                 <button type="button" className="btn btn-link btn-floating mx-1">
@@ -71,7 +75,7 @@ export const Login = () => {
                             <div className="row mb-4">
                                 <div className="col-md-6 d-flex justify-content-center">
                                     <div className="form-check mb-3 mb-md-0 custom-checkbox">
-                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked  />
+                                        <input className="form-check-input" type="checkbox" id="loginCheck" defaultChecked />
                                         <label className="form-check-label " htmlFor="loginCheck" >
                                             Remember me
                                         </label>
@@ -81,7 +85,7 @@ export const Login = () => {
                                     <Link to="/forgot-password" style={{ color: '#2D3748' }}>Lost password?</Link>
                                 </div>
                             </div>
-                            <button type="submit" className="btn btn-block mb-4" style={{ backgroundColor: '#2D3748', color: '#E2E8F0'}}>
+                            <button type="submit" className="btn btn-block mb-4" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
                                 Sign in
                             </button>
                         </form>

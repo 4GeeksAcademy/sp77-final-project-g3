@@ -3,7 +3,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			user: '',
 			message: null,
-			host: ``,
+			host: `https://organic-potato-jjrrj747gq993j799-3001.app.github.dev`,
 			user: '',
 			email: '',
 			isLogged: true,
@@ -11,12 +11,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 			budgets: [],
 			balance: [],
 			connections: [],
-			fixed_Expenses: [],
-			token: ''
+			fixedExpenses: [],
+			token: '',
+			sources: [],
+			categories: [],
 		},
 
 		actions: {
 			// actions for ExpenseVue
+			getToken: () => {
+				// esto funciona bien (lo hago trayendo el token desde consola)
+				let token = getStore().token;
+				console.log("Token desde el store:", token);
+
+				if (!token) {
+					token = localStorage.getItem("jwt_token");
+					console.log("Token desde el localStorage:", token);
+					if (token) {
+						setStore({ token });
+					}
+					console.log("Token desde el store:", token);
+				}
+				console.log("Token final:", token);
+				return token;
+			},
 			is_Logged: async () => {
 				const uri = ``
 				const options = ""
@@ -96,8 +114,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			setCurrentTransaction: (transaction) => { setStore({ transactions: transaction }) },
 			getTransactions: async () => {
-				const uri = `${getStore().host}/transactions`;
+				const uri = `${getStore().host}/api/transactions`;
 				const token = localStorage.getItem("jwt_token");
+
+				console.log("URI de la solicitud:", uri);
+				console.log("Token utilizado:", token);
 
 				const options = {
 					method: 'GET',
@@ -107,22 +128,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 				};
 
-				try {
-					const response = await fetch(uri, options);
+				const response = await fetch(uri, options);
 
-					if (!response.ok) {
-						console.log('Error:', response.status, response.statusText);
-						return;
-					}
+				console.log("Estado de la respuesta:", response.status, response.statusText);
 
-					const data = await response.json();
-					console.log('Data:', data);  // Opcional: para verificar la data en consola
-
-					// Suponiendo que `data.results` contiene las transacciones
-					setStore({ transactions: data.results });
-				} catch (error) {
-					console.error("Fetch error:", error);
+				if (!response.ok) {
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
 				}
+
+				const data = await response.json();
+				setStore({ transactions: data.results });
+				console.log("estas son las transactions", getStore().transactions)
+
 			},
 			createTransaction: async (loginData) => {
 				const uri = ``;
@@ -169,20 +187,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getTransaction();
 			},
 			setCurrentBudget: (Budget) => { setStore({ Budget: Budget }) },
-			getBudget: async () => {
-				const uri = ``
-				// console.log('URI:', uri);
+			getBudgets: async () => {
+				const uri = `${getStore().host}/api/budgets`;
+				const token = localStorage.getItem("jwt_token");
+
 				const options = {
 					method: 'GET',
-				}
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
 				const response = await fetch(uri, options);
 				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
 				}
+
 				const data = await response.json();
-				// console.log('este es el data:', data);
-				setStore({ Budget: data.results });
+				// Suponiendo que `data.results` contiene las transacciones
+				setStore({ budgets: data.results });
+				console.log("estas son los budgets", getStore().budgets)
 			},
 			createBudget: async (loginData) => {
 				const uri = ``;
@@ -228,23 +254,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				getActions().getBudget();
 			},
-			setCurrentFixedExpenses: (fixed_Expenses) => { setStore({ fixed_Expenses: fixed_Expenses }) },
 			getFixedExpenses: async () => {
-				const uri = ``
-				// console.log('URI:', uri);
+				const uri = `${getStore().host}/api/fixed-expenses`;
+				const token = localStorage.getItem("jwt_token");
+
 				const options = {
 					method: 'GET',
-				}
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
 				const response = await fetch(uri, options);
 				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
 				}
+
 				const data = await response.json();
-				// console.log('este es el data:', data);
-				setStore({ Budget: data.results });
+				// Suponiendo que `data.results` contiene las transacciones
+				setStore({ fixedExpenses: data.results });
+				console.log("estas son los fixed-expenses", getStore().fixedExpenses)
 			},
-			deleteFixedExpnese: async (id) => {
+			deleteFixedExpense: async (id) => {
 				const uri = ``;
 				const options = {
 					method: 'DELETE',
@@ -257,22 +290,30 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getFixedExpenses();
 			},
 			getBalance: async () => {
-				const uri = ``
-				// console.log('URI:', uri);
+				const uri = `${getStore().host}/api/balances`;
+				const token = localStorage.getItem("jwt_token");
+
 				const options = {
 					method: 'GET',
-				}
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
 				const response = await fetch(uri, options);
 				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
 				}
+
 				const data = await response.json();
-				// console.log('este es el data:', data);
-				setStore({ Balance: data.results });
+				// Suponiendo que `data.results` contiene las transacciones
+				setStore({ balance: data.results });
+				console.log("este es el balance", getStore().balance)
 			},
 			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
-			getFixedExpenses: async () => {
+			getConnections: async () => {
 				const uri = ``
 				// console.log('URI:', uri);
 				const options = {
@@ -300,7 +341,52 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getConnections();
 				setStore({ connections: data.results });
 			},
-			// comentario 
+			getSources: async () => {
+				const uri = `${getStore().host}/api/sources`;
+				const token = localStorage.getItem("jwt_token");
+
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
+				}
+
+				const data = await response.json();
+				// Suponiendo que `data.results` contiene las transacciones
+				setStore({ sources: data.results });
+				console.log("estas son los sources", getStore().sources)
+			},
+			getCategories: async () => {
+				const uri = `${getStore().host}/api/categories`;
+				const token = localStorage.getItem("jwt_token");
+
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+				};
+
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error en la respuesta:', response.status, response.statusText);
+					return;
+				}
+
+				const data = await response.json();
+				// Suponiendo que `data.results` contiene las transacciones
+				setStore({ categories: data.results });
+				console.log("estas son los categories", getStore().categories)
+			},
 		}
 	};
 };
