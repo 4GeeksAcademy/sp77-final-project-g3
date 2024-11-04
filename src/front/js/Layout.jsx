@@ -21,7 +21,6 @@ import { AuthProvider } from "../../contexts/authContext/index.jsx";
 import { Profile } from "./pages/Profile.jsx";
 
 
-
 // Create your first component
 const Layout = () => {
     // The basename is used when your project is published in a subdirectory and not in the root of the domain
