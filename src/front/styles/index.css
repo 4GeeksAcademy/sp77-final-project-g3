@@ -1,3 +1,67 @@
-/* 
-    General Styles used on every website (Don't Repeat Yourself)
-*/
+.link-secondary {
+    color: #2D3748;
+    text-decoration: none;
+}
+
+.link-secondary:hover {
+    color: #E2E8F0;
+}
+
+.text-dark {
+    color: #2D3748 !important;
+}
+
+.bg-success {
+    background-color: #2F855A;
+    color: white;
+}
+
+.bg-dark {
+    background-color: #2D3748;
+    color: white;
+    ;
+}
+
+
+/* Este cambia el color de los pills del login */
+.nav-pills .nav-link.active,
+.show>.nav-pills .nav-link{
+    background: #2D3748 !important;
+}
+
+.nav-pills .nav-link {
+    color: #2D3748; /* Color del texto cuando la pestaña no está activa */
+  }
+
+.nav-pills .nav-link.active {
+    color: #E2E8F0; /* Color del texto cuando la pestaña está activa */
+}
+
+/* este cambio el color del checkbox de remember me */
+.custom-checkbox input[type="checkbox"]:checked {
+    background-color: #2D3748; 
+    border-color: #2D3748; 
+}
+
+.textarea-large {
+    height: 200px; /* Ajusta la altura a lo que necesites */
+    width: 100%; /* Ocupa el 100% del ancho del contenedor */
+}
+
+.accordion-button.collapsed,
+.accordion-button {
+    color: #E2E8F0;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #2D3748;
+    color: #E2E8F0; 
+}
+
+.accordion-button::after {
+    filter: brightness(0) invert(1);
+}
+
+.accordion-button:not(.collapsed)::after {
+    filter: brightness(0) invert(1);
+}
