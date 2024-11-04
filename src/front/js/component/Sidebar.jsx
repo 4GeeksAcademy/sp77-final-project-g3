@@ -1,13 +1,27 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext.js";
 import { useContext } from "react";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
+import { doSignOut } from "/workspaces/sp77-final-project-g3/src/firebase/auth"; // Import sign-out function
 
 export const Sidebar = () => {
     const { store } = useContext(Context);
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await doSignOut();
+            console.log("User logged out");
+            navigate('/')
+
+        } catch (error) {
+            console.error("Error logging out:", error.message);
+        }
+    };
+
     return (
         <div className="sidebar-container">
             <Link to="/" className="navbar-brand">
@@ -73,7 +87,7 @@ export const Sidebar = () => {
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
                     <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
                     <li><hr className="dropdown-divider" /></li>
-                    <li><a className="dropdown-item" href="#">Sign out</a></li>
+                    <li><a className="dropdown-item" onClick={handleLogout} href="#">Sign out</a></li>
                 </ul>
             </div>
             <div className="sidebar-footer ms-2 mb-3">
