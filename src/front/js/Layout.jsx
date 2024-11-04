@@ -16,9 +16,9 @@ import { Transactions } from "./pages/Transactions.jsx"
 import { Budgets } from "./pages/Budgets.jsx"
 import { Balance } from "./pages/Balance.jsx"
 import { Connections } from "./pages/Connections.jsx"
-import { Guide } from "./pages/Guide.jsx"
 import { Contact } from "./pages/Contact.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
+import { Profile } from "./pages/Profile.jsx";
 
 
 // Create your first component
@@ -102,10 +102,10 @@ const Layout = () => {
                             </div>
                         }
                         />
-                        <Route path="/guide" element={
+                        <Route path="/profile" element={ 
                             <div className="d-flex">
                                 <Sidebar />
-                                <Guide />
+                                <Profile />
                             </div>
                         }
                         />

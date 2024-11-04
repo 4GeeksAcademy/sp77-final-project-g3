@@ -18,7 +18,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 
 		actions: {
-			// actions for ExpenseVue
+			login: async (dataToSend) => {
+				const uri = `${process.env.BACKEND_URL}/api/login`;
+				const options = {
+					method: 'POST',
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify(dataToSend)
+				}
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error', response.status, response.statusText);
+					return;
+				}
+				const data = await response.json()
+				console.log(data)
+				localStorage.setItem('token', data.access_token)
+				localStorage.setItem('user', JSON.stringify(data.results))
+				setStore({ isLoged: true, user: data.results.email })
+			},
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
@@ -35,6 +54,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("Token final:", token);
 				return token;
 			},
+			getMessage: async () => {
+				const uri = `${process.env.BACKEND_URL}/api/hello`
+				const options = {
+					method: 'GET'
+				}
+				const response = await fetch(uri, options)
+				if (!response.ok) {
+					console.log("Error loading message from backend", response.status)
+					return
+				}
+				const data = await response.json()
+				setStore({ message: data.message })
+				return data;
+			},
+			// actions for ExpenseVue
 			is_Logged: async () => {
 				const uri = ``
 				const options = ""
@@ -328,18 +362,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 				// console.log('este es el data:', data);
 				setStore({ fixedExpenses: data.results });
 			},
-			deleteConection: async (id) => {
-				const uri = ``;
-				const options = {
-					method: 'DELETE',
-				};
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				};
-				getActions().getConnections();
-				setStore({ connections: data.results });
+			getUser: async () => {
+				try {
+					const response = await fetch("URL_DEL_BACKEND/user", {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							// Agrega autenticación si es necesario
+							"Authorization": `Bearer ${store.token}`,
+						},
+					});
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ user: data });
+					} else {
+						console.error("Error al obtener los datos del usuario:", response.statusText);
+					}
+				} catch (error) {
+					console.error("Error en la conexión al backend:", error);
+				}
 			},
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
@@ -387,6 +428,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
 			},
+			deleteConection: async (id) => {
+				const uri = ``;
+				const options = {
+					method: 'DELETE',
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				};
+				getActions().getConnections();
+				setStore({ connections: data.results });
+			},
+
+
+
 		}
 	};
 };
