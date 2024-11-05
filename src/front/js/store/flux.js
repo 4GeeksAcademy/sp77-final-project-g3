@@ -35,7 +35,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log(data)
 				localStorage.setItem('token', data.access_token)
 				localStorage.setItem('user', JSON.stringify(data.results))
-				setStore({ isLoged: true, user: data.results.email })
+				localStorage.setItem("user_id", data.results.id)
+				setStore({ isLogged: true, user: data.results })
 			},
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
@@ -361,26 +362,31 @@ const getState = ({ getStore, getActions, setStore }) => {
 				// console.log('este es el data:', data);
 				setStore({ fixedExpenses: data.results });
 			},
-			getUser: async () => {
+			getUser: async (id) => {
 				try {
-					const response = await fetch("URL_DEL_BACKEND/user", {
+					const token = getStore().token || localStorage.getItem("jwt_token");
+					const response = await fetch(`${process.env.BACKEND_URL}/api/users/${id}`, {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
-							// Agrega autenticación si es necesario
-							"Authorization": `Bearer ${store.token}`,
+							"Authorization": `Bearer ${token}`,
 						},
 					});
 					if (response.ok) {
 						const data = await response.json();
-						setStore({ user: data });
+						console.log("Datos de usuario recibidos:", data);
+						if (data.results) {
+							setStore({ user: data.results });
+						} else {
+							console.error("Formato de respuesta inesperado:", data);
+						}
 					} else {
 						console.error("Error al obtener los datos del usuario:", response.statusText);
 					}
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},
+			},								
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -440,6 +446,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getConnections();
 				setStore({ connections: data.results });
 			},
+			updateUser: async (id, userData) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/users/${id}`, {
+						method: 'PUT',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': `Bearer ${localStorage.getItem('token')}`
+						},
+						body: JSON.stringify(userData)
+					});
+					if (!response.ok) {
+						const errorResponse = await response.json();
+						throw new Error(errorResponse.message || 'Error en la actualización');
+					}
+					return true;
+				} catch (error) {
+					console.error('Error updating user:', error);
+					return false;
+				}
+			},						
 		}
 	};
 };

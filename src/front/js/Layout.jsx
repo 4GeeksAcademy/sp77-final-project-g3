@@ -67,42 +67,42 @@ const Layout = () => {
                         />
                         {/* Otras rutas con solo Sidebar */}
                         <Route path="/dashboard" element={
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Dashboard />
                             </div>
                         }
                         />
                         <Route path="/transactions" element={
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Transactions />
                             </div>
                         }
                         />
                         <Route path="/budgets" element={
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Budgets />
                             </div>
                         }
                         />
                         <Route path="/balance" element={
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Balance />
                             </div>
                         }
                         />
                         <Route path="/connections" element={
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Connections />
                             </div>
                         }
                         />
                         <Route path="/profile" element={ 
-                            <div className="d-flex">
+                            <div className="main-content">
                                 <Sidebar />
                                 <Profile />
                             </div>

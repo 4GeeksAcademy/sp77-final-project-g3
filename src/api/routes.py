@@ -549,3 +549,62 @@ def budget(id):
         response_body['message'] = "The budget was deleted (DELETE)"
         response_body['results'] = {}
         return response_body, 200
+
+
+@api.route('/users', methods=['GET', 'POST'])
+@jwt_required()
+def users():
+    response_body = {}
+    if request.method == 'GET':
+        rows = db.session.execute(db.select(Users)).scalars()
+        result = [row.serialize() for row in rows]
+        response_body['message'] = 'List of Users'
+        response_body['results'] = result
+        return response_body, 200
+    if request.method == 'POST':
+        data = request.json
+        row = Users(email = data.get('email'),
+                    password = data.get('password'),
+                    first_name = data.get('first_name'),
+                    last_name = data.get('last_name'),
+                    phone_number = data.get('phone_number'))
+        db.session.add(row)
+        db.session.commit()
+        response_body['message'] = 'Created a New User'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+
+
+@api.route('/users/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def user(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    print("current_user:", current_user) 
+    row = db.session.execute(db.select(Users).where(Users.id == id)).scalar()
+    if not row:
+        response_body['message'] = f'The user {id} does not exist'
+        response_body['results'] = {}
+        return response_body, 404
+    if request.method == 'GET':
+        response_body['message'] = f'User {id}'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'PUT':
+        data = request.json
+        row.email = data.get('email', row.email)
+        row.password = data.get('password', row.password)
+        row.first_name = data.get('first_name', row.first_name)
+        row.last_name = data.get('last_name', row.last_name)
+        row.phone_number = data.get('phone_number', row.phone_number)
+        row.photo_url = data.get('photo_url', row.photo_url)
+        db.session.commit()
+        response_body['message'] = f'User {id} edited'
+        response_body['results'] = row.serialize()
+        return response_body, 200
+    if request.method == 'DELETE':
+        db.session.delete(row)
+        db.session.commit()
+        response_body['message'] = f'User {id} deleted'
+        response_body['results'] = {}
+        return response_body, 200
