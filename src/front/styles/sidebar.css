@@ -1,0 +1,33 @@
+.sidebar-container {
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    height: 100vh;
+    width: 250px; 
+    background-color: #ffc107;
+    overflow-y: auto;
+    padding: 1rem; 
+    color: white; 
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 1rem; 
+    width: calc(100% - 2rem);
+    color: #2D3748;
+    font-weight: bold;
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 1rem;
+}
+
+.sidebar-link {
+    color: #2D3748;
+    text-decoration: none;
+}
+
+.sidebar-link:hover {
+    color: #E2E8F0;
+}

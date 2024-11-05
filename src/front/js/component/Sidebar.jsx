@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext.js";
 import { useContext } from "react";
-import "../../styles/nav.css";
+import "../../styles/sidebar.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import userImg from "../../img/user-img.png";
 import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
@@ -90,7 +90,7 @@ export const Sidebar = () => {
                     <li><a className="dropdown-item" onClick={handleLogout} href="#">Sign out</a></li>
                 </ul>
             </div>
-            <div className="sidebar-footer ms-2 mb-3">
+            <div className="sidebar-footer">
                 <span>© ExpenseVue</span>
             </div>
         </div>
