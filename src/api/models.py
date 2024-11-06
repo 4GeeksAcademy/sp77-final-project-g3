@@ -70,6 +70,7 @@ class Balances(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     total_balance = db.Column(db.Float(), unique=False, nullable=False)
     monthly_expenses = db.Column(db.Float(), unique=False, nullable=False)
+    monthly_income = db.Column(db.Float(), unique=False, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True)
     user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('balance_to', lazy='select'))
 
@@ -80,6 +81,7 @@ class Balances(db.Model):
         return {'id': self.id,
                 'total_balance': self.total_balance,
                 'monthly_expenses': self.monthly_expenses,
+                'monthly_income': self.monthly_income,
                 'user_id': self.user_id}
     
 
@@ -105,6 +107,8 @@ class Categories(db.Model):
 class Transactions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float(), unique=False, nullable=False)
+    name = db.Column(db.String(), unique=False, nullable=False)
+    type = db.Column(db.Enum("income", "expense", name="type"), nullable=False)
     description = db.Column(db.String(), unique=False, nullable=True)
     date = db.Column(db.DateTime(), nullable=False, default=datetime.now(tz=timezone.utc))
     source_id = db.Column(db.Integer, db.ForeignKey('sources.id'))
@@ -118,10 +122,13 @@ class Transactions(db.Model):
     def serialize(self):
         return {'id': self.id,
                 'amount': self.amount,
+                'name': self.name,
+                'type': self.type,
                 'description': self.description,
                 'date': self.date,
                 'source_id': self.source_id,
-                'category_id': self.category_id}
+                'category_id': self.category_id,
+                'source': self.source_to.serialize() if self.source_to else None } # esto me permite acceso a los datos de source
 
 
 class FixedExpenses(db.Model):

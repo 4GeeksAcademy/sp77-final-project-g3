@@ -8,7 +8,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			isLogged: true,
 			transactions: [],
 			budgets: [],
-			balance: [],
+			balance: {},
 			connections: [],
 			fixedExpenses: [],
 			token: '',
@@ -386,7 +386,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},								
+			},
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -465,7 +465,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error('Error updating user:', error);
 					return false;
 				}
-			},						
+			},
 		}
 	};
 };
