@@ -51,15 +51,6 @@ li {
     }
 }
 
-.sidebar-link {
-    color: #2D3748;
-    text-decoration: none;
-}
-
-.sidebar-link:hover {
-    color: #E2E8F0;
-}
-
 .user-settings {
     color: #2D3748;
     text-decoration: none;
@@ -73,19 +64,4 @@ li {
     background-color: #2D3748;
 }
 
-/* Clase personalizada para que el Sidebar ocupe toda la altura de la pantalla */
-.sidebar-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 250px;
-    background-color: #ffc107; /* bg-warning */
-}
 
-.sidebar-content {
-    flex-grow: 1; /* Permite que el contenido principal crezca para llenar el espacio */
-}
-
-.sidebar-footer {
-    margin-top: auto; /* Empuja el pie de página al final del Sidebar */
-}
