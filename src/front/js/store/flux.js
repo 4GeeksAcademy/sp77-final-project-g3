@@ -465,7 +465,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error('Error updating user:', error);
 					return false;
 				}
-			},						
+			},				
 		}
 	};
 };

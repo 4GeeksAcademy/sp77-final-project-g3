@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
 import injectContext from "./store/appContext";
+// Custom components
 import ScrollToTop from "./component/ScrollToTop.jsx";
 import { BackendURL } from "./component/BackendURL.jsx";
 import { Navbar } from "./component/Navbar.jsx";
@@ -17,13 +18,14 @@ import { Balance } from "./pages/Balance.jsx";
 import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Profile } from "./pages/Profile.jsx";
+import { Error404 } from "./pages/Error404.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
 // Layout con Navbar y Footer
 const NavbarFooterLayout = () => (
     <div className="d-flex flex-column min-vh-100">
         <Navbar />
-        <Outlet /> {/* Renderiza las páginas hijas aquí */}
+        <Outlet /> 
         <Footer />
     </div>
 );
@@ -32,7 +34,7 @@ const NavbarFooterLayout = () => (
 const SidebarLayout = () => (
     <div className="main-content">
         <Sidebar />
-        <Outlet /> {/* Renderiza las páginas hijas aquí */}
+        <Outlet /> 
     </div>
 );
 
@@ -65,7 +67,7 @@ const Layout = () => {
                         </Route>
 
                         {/* Ruta para Not Found */}
-                        <Route path="*" element={<h1>Not found!</h1>} />
+                        <Route path="*" element={<Error404 />} />
                     </Routes>
                 </ScrollToTop>
             </BrowserRouter>
