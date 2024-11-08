@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
 import injectContext from "./store/appContext";
 // Custom components
 import ScrollToTop from "./component/ScrollToTop.jsx";
@@ -12,21 +12,38 @@ import { Home } from "./pages/Home.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
 import { Login } from "./pages/Login.jsx";
 import { Faq } from "./pages/Faq.jsx";
-import { Transactions } from "./pages/Transactions.jsx"
-import { Budgets } from "./pages/Budgets.jsx"
-import { Balance } from "./pages/Balance.jsx"
-import { Connections } from "./pages/Connections.jsx"
+import { Transactions } from "./pages/Transactions.jsx";
+import { Budgets } from "./pages/Budgets.jsx";
+import { Balance } from "./pages/Balance.jsx";
+import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
-import { AuthProvider } from "../../contexts/authContext/index.jsx";
 import { Profile } from "./pages/Profile.jsx";
 import { EditTransaction } from "./pages/EditTransaction.jsx";
+import { Error404 } from "./pages/Error404.jsx";
+import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
-// Create your first component
+
+// Layout con Navbar y Footer
+const NavbarFooterLayout = () => (
+    <div className="d-flex flex-column min-vh-100">
+        <Navbar />
+        <Outlet /> 
+        <Footer />
+    </div>
+);
+
+// Layout con Sidebar
+const SidebarLayout = () => (
+    <div className="main-content">
+        <Sidebar />
+        <Outlet /> 
+    </div>
+);
+
+// Componente principal
 const Layout = () => {
-    // The basename is used when your project is published in a subdirectory and not in the root of the domain
-    // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
-    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL === "") return <BackendURL />;
 
     return (
         <AuthProvider>
@@ -117,6 +134,28 @@ const Layout = () => {
                         }
                         />
                         <Route path="*" element={<h1>Not found!</h1>} />
+
+                        {/* Rutas con Navbar y Footer */}
+                        <Route element={<NavbarFooterLayout />}>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/faq" element={<Faq />} />
+                            <Route path="/contact" element={<Contact />} />
+                        </Route>
+
+                        {/* Rutas con Sidebar */}
+                        <Route element={<SidebarLayout />}>
+                            <Route path="/dashboard" element={<Dashboard />} />
+                            <Route path="/transactions" element={<Transactions />} />
+                            <Route path="/budgets" element={<Budgets />} />
+                            <Route path="/balance" element={<Balance />} />
+                            <Route path="/connections" element={<Connections />} />
+                            <Route path="/profile" element={<Profile />} />
+                        </Route>
+
+                        {/* Ruta para Not Found */}
+                        <Route path="*" element={<Error404 />} />
+
                     </Routes>
                 </ScrollToTop>
             </BrowserRouter>

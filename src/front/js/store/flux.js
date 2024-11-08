@@ -1,17 +1,17 @@
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			user: {},
+			user: JSON.parse(localStorage.getItem('user')) || {},
 			message: null,
 			host: process.env.BACKEND_URL,
 			email: '',
-			isLogged: true,
+			isLogged: Boolean(localStorage.getItem('token')),
 			transactions: [],
 			budgets: [],
 			balance: {},
 			connections: [],
 			fixedExpenses: [],
-			token: '',
+			token: localStorage.getItem('token') || '',
 			sources: [],
 			categories: [],
 			currentTransaction: {},
@@ -19,26 +19,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		actions: {
 			login: async (dataToSend) => {
-				const uri = `${process.env.BACKEND_URL}/api/login`;
-				const options = {
-					method: 'POST',
-					headers: {
-						"Content-Type": 'application/json'
-					},
-					body: JSON.stringify(dataToSend)
-				}
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error', response.status, response.statusText);
-					return;
-				}
-				const data = await response.json()
-				console.log(data)
-				localStorage.setItem('token', data.access_token)
-				localStorage.setItem('user', JSON.stringify(data.results))
-				localStorage.setItem("user_id", data.results.id)
-				setStore({ isLogged: true, user: data.results })
-			},
+                const uri = `${process.env.BACKEND_URL}/api/login`;
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                };
+                const response = await fetch(uri, options);
+                if (!response.ok) {
+                    console.log('Error', response.status, response.statusText);
+                    return;
+                }
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.results));
+                setStore({ token: data.access_token, user: data.results, isLogged: true });
+            },
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
@@ -250,7 +248,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ budgets: data.results });
 				console.log("estas son los budgets", getStore().budgets)
 			},
@@ -317,7 +314,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ fixedExpenses: data.results });
 				console.log("estas son los fixed-expenses", getStore().fixedExpenses)
 			},
@@ -352,14 +348,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ balance: data.results });
 				console.log("este es el balance", getStore().balance)
 			},
 			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
 			getConnections: async () => {
 				const uri = ``
-				// console.log('URI:', uri);
 				const options = {
 					method: 'GET',
 				}
@@ -369,7 +363,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return
 				}
 				const data = await response.json();
-				// console.log('este es el data:', data);
 				setStore({ fixedExpenses: data.results });
 			},
 			getUser: async (id) => {
@@ -396,7 +389,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},
+			},								
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -416,7 +409,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ sources: data.results });
 				console.log("estas son los sources", getStore().sources)
 			},
@@ -439,7 +431,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
 			},
@@ -475,7 +466,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error('Error updating user:', error);
 					return false;
 				}
+
+
+			},			
+
 			},
+			logout: () => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setStore({ token: '', user: {}, isLogged: false });
+            },	
+
 		}
 	};
 };

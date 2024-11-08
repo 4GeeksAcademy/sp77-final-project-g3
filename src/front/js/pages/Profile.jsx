@@ -15,6 +15,7 @@ export const Profile = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [file, setFile] = useState(null);  // Estado para el archivo de imagen
 
     useEffect(() => {
         const userId = store.user?.id || localStorage.getItem("user_id");
@@ -48,18 +49,46 @@ export const Profile = () => {
     };
 
     const handleSaveClick = async () => {
-		console.log("Saving user data:", formData); // Log form data
-		const success = await actions.updateUser(formData.id, formData);
-		if (success) {
-			console.log("Actualización exitosa");
-			setIsEditing(false);
-		} else {
-			console.error("Error en la actualización"); // Log error
-			setError("Error en la actualización");
-		}
-	};	
+        const success = await actions.updateUser(formData.id, formData);
+        if (success) {
+            setIsEditing(false);
+        } else {
+            setError("Error en la actualización");
+        }
+    };
 
     const profileImg = store.user?.photo_url || userImg;
+
+    const handleImg = (event) => {
+        if (event.target.files.length) {
+            setFile(event.target.files[0]);
+            sendImage(event.target.files[0]);  // Llama a sendImage inmediatamente
+        }
+    };
+
+    const sendImage = async (imageFile) => {
+        try {
+            const form = new FormData();
+            form.append("img", imageFile);
+    
+            const response = await fetch(`${store.host}/api/upload`, {
+                method: 'POST',
+                body: form
+            });
+            const data = await response.json();
+    
+            if (data.url) {
+                const success = await actions.updateUser(store.user.id, { photo_url: data.url });
+                if (success) {
+                    // Recarga la página para reflejar los cambios inmediatamente
+                    window.location.reload();
+                }
+            }
+        } catch (error) {
+            console.log("ERROR", error);
+            setError("Error al subir la imagen");
+        }
+    };    
 
     if (loading) return <Spinner />;
     if (error) return <div className="alert alert-danger">{error}</div>;
@@ -79,8 +108,11 @@ export const Profile = () => {
                         <div className="card-body text-center">
                             <img src={profileImg} alt="avatar" className="rounded-circle img-fluid" style={{ width: "150px" }} />
                             <h5 className="my-3">{store.user?.first_name} {store.user?.last_name}</h5>
-                            <div className="d-flex justify-content-center mb-2">
-                                <button type="button" className="btn btn-dark">Not Available</button>
+                            <div className="d-flex flex-column align-items-center mb-2">
+                                <label className="btn btn-dark" style={{ fontWeight:'bold' }}>
+                                    Upload Image
+                                    <input type="file" onChange={handleImg} style={{ display: 'none' }} />
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -110,9 +142,9 @@ export const Profile = () => {
                             ))}
                             <div className="text-end">
                                 {isEditing ? (
-                                    <button onClick={handleSaveClick} className="btn btn-dark">Save</button>
+                                    <button onClick={handleSaveClick} className="btn btn-dark" style={{ fontWeight:'bold' }}>Save</button>
                                 ) : (
-                                    <button onClick={handleEditClick} className="btn btn-dark">Edit</button>
+                                    <button onClick={handleEditClick} className="btn btn-dark" style={{ fontWeight:'bold' }}>Edit</button>
                                 )}
                             </div>
                         </div>
