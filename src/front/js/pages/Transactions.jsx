@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext.js";
 import '../../styles/transactions.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleArrowUp, faCircleArrowDown, faBuildingColumns, faTrashCan, faCreditCard, faMoneyBills, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCircleArrowUp, faCircleArrowDown, faBuildingColumns, faChartLine, faTrashCan, faCreditCard, faMoneyBills, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Spinner } from "../component/Spinner.jsx";
-import { TransactionsChart } from "../component/BalanceChart.jsx";
+import { TransactionsChart } from "../component/TransactionsChart.jsx";
 import { useNavigate } from "react-router-dom";
 
 export const Transactions = () => {
@@ -16,9 +16,15 @@ export const Transactions = () => {
 	const [description, setDescription] = useState('')
 	const [amount, setAmount] = useState('')
 	const [date, setDate] = useState('')
+	const [selectedFilterType, setSelectedFilterType] = useState(null); // Tipo de filtro seleccionado
+	const [filterValue, setFilterValue] = useState(''); // Valor del filtro
+	const [filteredTransactions, setFilteredTransactions] = useState(store.transactions || []); // Estado de transacciones filtradas
 	const navigate = useNavigate();
 
-	
+	useEffect(() => {
+		setFilteredTransactions(store.transactions);
+	}, [store.transactions]);
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
 
@@ -77,6 +83,43 @@ export const Transactions = () => {
 		console.log("this is the data to send to current transaction:", itemEdited)
 		navigate('/edit-transaction');
 	}
+
+	const applyFilter = (criteria, value) => {
+		if (value === "") {
+			setFilteredTransactions(store.transactions); 
+		} else {
+			const filtered = store.transactions.filter((transaction) => {
+				if (criteria === 'source') {
+					return transaction.source && transaction.source.id === parseInt(value);
+				} else if (criteria === 'category') {
+					return transaction.category && transaction.category.id === parseInt(value);
+				} else if (criteria === 'date') {
+					return formatDate(transaction.date) === value;
+				} else {
+					return transaction[criteria] === value;
+				}
+			});
+			setFilteredTransactions(filtered);
+		}
+	};
+
+	const handleFilterSelection = (filterType) => {
+		setSelectedFilterType(filterType); 
+		setFilterValue(''); 
+		setFilteredTransactions(store.transactions); 
+	};
+
+	const handleFilterValueChange = (event) => {
+		const { value } = event.target;
+		setFilterValue(value);
+		applyFilter(selectedFilterType, value);
+	};
+
+	const clearFilters = () => {
+		setSelectedFilterType(null);
+		setFilterValue('');
+		setFilteredTransactions(store.transactions);
+	};
 
 	return (
 		<div className="transactions-container">
@@ -180,11 +223,11 @@ export const Transactions = () => {
 							</div>
 						</div>
 					</div>
-					<div className="card mb-2">
+					<div className="mb-2">
 						{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
-							(<div className="card-body d-flex flex-row align-items-center justify-content-center">
-								<div className="stat me-3 d-flex flex-row align-items-center justify-content-center">
-									<div className="m-3">
+							(<div className="d-flex flex-row align-items-center justify-content-center">
+								<div className="card p-2 stat me-3 d-flex flex-row align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+									<div className="m-1">
 										<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
 									</div>
 									<div >
@@ -192,8 +235,8 @@ export const Transactions = () => {
 											€{store.balance.monthly_income}</p>
 									</div>
 								</div>
-								<div className="stat me-3 d-flex flex-row  align-items-center justify-content-center">
-									<div className="m-3">
+								<div className="card p-2 stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+									<div className="m-1">
 										<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
 									</div>
 									<div >
@@ -201,8 +244,11 @@ export const Transactions = () => {
 											€{store.balance.monthly_expenses}</p>
 									</div>
 								</div>
-								<div className="stat me-3 d-flex flex-row  align-items-center justify-content-center">
-									<div className="m-3">
+								<div className="card p-2  stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+								<div className="m-1">
+								<FontAwesomeIcon icon={faChartLine}  style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+									</div>
+									<div>
 										<p> Balance <br />
 											€{store.balance.total_balance}</p>
 									</div>
@@ -211,9 +257,56 @@ export const Transactions = () => {
 					</div>
 				</header>
 				<TransactionsChart />
+				<div className="d-flex justify-content-end mb-3">
+					<div className="dropdown">
+						<button className="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
+							Filter
+						</button>
+						<ul className="dropdown-menu bg-light" aria-labelledby="filterDropdown">
+							<li><button className="dropdown-item" onClick={() => handleFilterSelection('type')}>Type</button></li>
+							<li><button className="dropdown-item" onClick={() => handleFilterSelection('source')}>Source</button></li>
+							<li><button className="dropdown-item" onClick={() => handleFilterSelection('category')}>Category</button></li>
+							<li><button className="dropdown-item" onClick={() => handleFilterSelection('date')}>Date</button></li>
+							<li><button className="dropdown-item" onClick={clearFilters}>Clear All Filters</button></li>
+						</ul>
+						{selectedFilterType && (
+							<div className="mt-2">
+								<label>{`Filter by ${selectedFilterType}`}</label>
+								{selectedFilterType === 'date' ? (
+									<input
+										type="date"
+										className="form-control mt-1"
+										value={filterValue}
+										onChange={handleFilterValueChange}
+									/>
+								) : (
+									<select className="form-select mt-1" value={filterValue} onChange={handleFilterValueChange}>
+										<option value="">Select an option</option>
+										{selectedFilterType === 'type' && (
+											<>
+												<option value="income">Income</option>
+												<option value="expense">Expense</option>
+											</>
+										)}
+										{selectedFilterType === 'source' && store.sources && store.sources.map(source => (
+											<option key={source.id} value={source.id}>{source.name}</option>
+										))}
+										{selectedFilterType === 'category' && store.categories && store.categories.map(cat => (
+											<option key={cat.id} value={cat.id}>{cat.name}</option>
+										))}
+									</select>
+								)}
+							</div>
+						)}
+					</div>
+				</div>
+
 				<div className="transactions-list card p-3">
 					<table>
 						<thead>
+							<tr>
+								<th colSpan="4" className="h5">Transaction Activity</th>
+							</tr>
 							<tr>
 								<th>Transaction</th>
 								<th>Type</th>
@@ -222,12 +315,12 @@ export const Transactions = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{!store.transactions || store.transactions.length === 0 ? (
+							{!filteredTransactions || filteredTransactions.length === 0 ? (
 								<tr>
-									<td colSpan="4" >  <div className="m-3"> <Spinner />  </div></td>
+									<td colSpan="4"> <div className="m-3"> <Spinner /> </div></td>
 								</tr>
 							) : (
-								store.transactions.map((item, index) => (
+								filteredTransactions.map((item, index) => (
 									<tr key={item.id}>
 										<td>{item.name}</td>
 										<td>
@@ -250,12 +343,9 @@ export const Transactions = () => {
 										<td className="amount">
 											{item.type === 'income' ? `€${item.amount}` : `-€${item.amount}`}
 										</td>
-
 										<td> {item.source.type_source === 'manual_entry' ? <button type="button" onClick={() => editTransaction(item)} className="btn"> <FontAwesomeIcon icon={faPen} /> </button> : <FontAwesomeIcon icon={faPen} className="d-none" />}</td>
-
 										<td> {item.source.type_source === 'manual_entry' ? <button type="button" className="btn" onClick={() => deleteTransaction(item.id)}> <FontAwesomeIcon icon={faTrashCan} /> </button> : <FontAwesomeIcon icon={faPen} className="d-none" />}</td>
 									</tr>
-
 								))
 							)}
 						</tbody>

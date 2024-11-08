@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Context } from "../store/appContext.js";
+import { Spinner } from "../component/Spinner.jsx";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -87,7 +88,7 @@ export const TransactionsChart = () => {
             {store.transactions.length > 0 ? (
                 <Bar data={chartData} options={options} />
             ) : (
-                <p>Loading transaction data...</p>
+                <p><Spinner /></p>
             )}
         </div>
     );
