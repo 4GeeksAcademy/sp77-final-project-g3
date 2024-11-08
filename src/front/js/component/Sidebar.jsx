@@ -8,15 +8,15 @@ import userImg from "../../img/user-img.png";
 import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
 
 export const Sidebar = () => {
-    const { store } = useContext(Context);
+    const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
             await doSignOut();
             console.log("User logged out");
-            navigate('/')
-
+            actions.logout(); // Llama al logout del Flux para limpiar el store y localStorage
+            navigate('/'); // Redirige al usuario después de la limpieza
         } catch (error) {
             console.error("Error logging out:", error.message);
         }
