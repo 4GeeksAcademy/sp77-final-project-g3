@@ -398,6 +398,8 @@ def transactions():
     if request.method == 'POST':
         data = request.json
         row = Transactions(amount = data.get('amount'),
+                           name = data.get('name'),
+                           type = data.get('type'),
                            description = data.get('description'),
                            date = data.get('date'),
                            source_id = data.get('source_id'),
@@ -426,6 +428,8 @@ def transaction(id):
     if request.method == 'PUT':
         data = request.json
         row.amount = data.get('amount', row.amount)
+        row.name = data.get('name', row.name)
+        row.type = data.get('type', row.type)
         row.description = data.get('description', row.description)
         row.date = data.get('date', row.date)
         row.source_id = data.get('source_id', row.source_id)

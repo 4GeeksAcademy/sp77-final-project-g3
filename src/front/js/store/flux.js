@@ -8,12 +8,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			isLogged: Boolean(localStorage.getItem('token')),
 			transactions: [],
 			budgets: [],
-			balance: [],
+			balance: {},
 			connections: [],
 			fixedExpenses: [],
 			token: localStorage.getItem('token') || '',
 			sources: [],
 			categories: [],
+			currentTransaction: {},
 		},
 
 		actions: {
@@ -144,7 +145,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				getActions().getuser();
 			},
-			setCurrentTransaction: (transaction) => { setStore({ transactions: transaction }) },
+			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;
 				const token = localStorage.getItem("jwt_token");
@@ -174,27 +175,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("estas son las transactions", getStore().transactions)
 
 			},
-			createTransaction: async (loginData) => {
-				const uri = ``;
+			createTransaction: async (transactionData) => {
+				const uri = `${getStore().host}/api/transactions`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(loginData),
+					headers: { 
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`},
+					body: JSON.stringify(transactionData),
 				}
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error:', error.status, error.statusText);
 					return
 				}
-
+				const data = await response.json();
 				getActions().getTransactions();
 			},
 			editTransaction: async (id, dataToSend) => {
-				const uri = ``;
+				const uri = `${getStore().host}/api/transactions/${id}`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`,
 					},
 					body: JSON.stringify(dataToSend),
 				};
@@ -207,16 +213,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getTransactions();
 			},
 			deleteTransaction: async (id) => {
-				const uri = ``;
+				const uri = `${getStore().host}/api/transactions/${id}`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'DELETE',
-				};
+					headers: {
+					  'Authorization': `Bearer ${token}`,
+					},
+				  };
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error:', response.status, response.statusText);
 					return
 				};
-				getActions().getTransaction();
+				getActions().getTransactions();
 			},
 			setCurrentBudget: (Budget) => { setStore({ Budget: Budget }) },
 			getBudgets: async () => {
@@ -238,7 +248,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ budgets: data.results });
 				console.log("estas son los budgets", getStore().budgets)
 			},
@@ -305,7 +314,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ fixedExpenses: data.results });
 				console.log("estas son los fixed-expenses", getStore().fixedExpenses)
 			},
@@ -340,14 +348,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ balance: data.results });
 				console.log("este es el balance", getStore().balance)
 			},
 			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
 			getConnections: async () => {
 				const uri = ``
-				// console.log('URI:', uri);
 				const options = {
 					method: 'GET',
 				}
@@ -357,7 +363,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return
 				}
 				const data = await response.json();
-				// console.log('este es el data:', data);
 				setStore({ fixedExpenses: data.results });
 			},
 			getUser: async (id) => {
@@ -384,7 +389,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},								
+			},
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -404,7 +409,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ sources: data.results });
 				console.log("estas son los sources", getStore().sources)
 			},
@@ -427,7 +431,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
 			},
@@ -463,12 +466,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error('Error updating user:', error);
 					return false;
 				}
+
+
+			},
+			},				
+
 			},
 			logout: () => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 setStore({ token: '', user: {}, isLogged: false });
             },	
+
 		}
 	};
 };
