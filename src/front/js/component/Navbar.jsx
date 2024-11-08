@@ -19,7 +19,7 @@ export const Navbar = () => {
 
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-light" aria-label="Offcanvas navbar large" style={{ backgroundColor: '#F9D423' }}>
+        <nav className="navbar navbar-expand-lg navbar-light" aria-label="Offcanvas navbar large" style={{ backgroundColor: '#ffc107' }}>
             <div className="container">
                 <Link to="/" className="navbar-brand">
                     <img className="mx-4" height="70" src={logoExpenseVue} alt="ExpenseVue Logo" />

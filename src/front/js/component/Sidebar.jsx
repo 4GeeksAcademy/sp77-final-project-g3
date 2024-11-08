@@ -22,6 +22,8 @@ export const Sidebar = () => {
         }
     };
 
+    const profileImage = store.user?.photo_url || userImg;
+
     return (
         <div className="sidebar-container">
             <Link to="/" className="navbar-brand">
@@ -81,7 +83,7 @@ export const Sidebar = () => {
             <hr />
             <div className="dropdown mb-3 ms-2">
                 <a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src={userImg} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
+                    <img src={profileImage} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
                     <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">

@@ -250,7 +250,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ budgets: data.results });
 				console.log("estas son los budgets", getStore().budgets)
 			},
@@ -317,7 +316,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ fixedExpenses: data.results });
 				console.log("estas son los fixed-expenses", getStore().fixedExpenses)
 			},
@@ -352,14 +350,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ balance: data.results });
 				console.log("este es el balance", getStore().balance)
 			},
 			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
 			getConnections: async () => {
 				const uri = ``
-				// console.log('URI:', uri);
 				const options = {
 					method: 'GET',
 				}
@@ -369,7 +365,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return
 				}
 				const data = await response.json();
-				// console.log('este es el data:', data);
 				setStore({ fixedExpenses: data.results });
 			},
 			getUser: async (id) => {
@@ -416,7 +411,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ sources: data.results });
 				console.log("estas son los sources", getStore().sources)
 			},
@@ -439,7 +433,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 				const data = await response.json();
-				// Suponiendo que `data.results` contiene las transacciones
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
 			},
@@ -475,7 +468,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error('Error updating user:', error);
 					return false;
 				}
+
 			},
+			},				
 		}
 	};
 };

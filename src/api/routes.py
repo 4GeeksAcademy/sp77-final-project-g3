@@ -12,6 +12,8 @@ from flask_jwt_extended import jwt_required
 from dotenv import load_dotenv
 import os
 import requests
+import cloudinary
+import cloudinary.uploader
 
 
 api = Blueprint('api', __name__)
@@ -612,3 +614,14 @@ def user(id):
         response_body['message'] = f'User {id} deleted'
         response_body['results'] = {}
         return response_body, 200
+
+
+@api.route('/upload', methods=['POST'])
+def upload():
+    file_to_upload = request.files.get('img')
+    if file_to_upload:
+        upload = cloudinary.uploader.upload(file_to_upload)
+        image_url = upload.get("url")  # Obtén solo la URL
+        print('-------------la url donde esta la imagen-------------', image_url)
+        return jsonify({"url": image_url}), 200  # Retorna solo la URL de la imagen
+    return jsonify({"error": "No file uploaded"}), 400
