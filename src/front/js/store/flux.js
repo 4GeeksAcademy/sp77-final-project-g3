@@ -19,24 +19,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		actions: {
 			login: async (dataToSend) => {
-                const uri = `${process.env.BACKEND_URL}/api/login`;
-                const options = {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": 'application/json'
-                    },
-                    body: JSON.stringify(dataToSend)
-                };
-                const response = await fetch(uri, options);
-                if (!response.ok) {
-                    console.log('Error', response.status, response.statusText);
-                    return;
-                }
-                const data = await response.json();
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('user', JSON.stringify(data.results));
-                setStore({ token: data.access_token, user: data.results, isLogged: true });
-            },
+				const uri = `${process.env.BACKEND_URL}/api/login`;
+				const options = {
+					method: 'POST',
+					headers: {
+						"Content-Type": 'application/json'
+					},
+					body: JSON.stringify(dataToSend)
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error', response.status, response.statusText);
+					return;
+				}
+				const data = await response.json();
+				localStorage.setItem('token', data.access_token);
+				localStorage.setItem('user', JSON.stringify(data.results));
+				setStore({ token: data.access_token, user: data.results, isLogged: true });
+			},
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
@@ -180,9 +180,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'POST',
-					headers: { 
+					headers: {
 						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${token}`},
+						'Authorization': `Bearer ${token}`
+					},
 					body: JSON.stringify(transactionData),
 				}
 				const response = await fetch(uri, options);
@@ -218,9 +219,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const options = {
 					method: 'DELETE',
 					headers: {
-					  'Authorization': `Bearer ${token}`,
+						'Authorization': `Bearer ${token}`,
 					},
-				  };
+				};
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error:', response.status, response.statusText);
@@ -389,7 +390,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},								
+			},
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -468,16 +469,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 
-			},			
-
 			},
 			logout: () => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                setStore({ token: '', user: {}, isLogged: false });
-            },	
-
+				localStorage.removeItem('token');
+				localStorage.removeItem('user');
+				setStore({ token: '', user: {}, isLogged: false });
+			}
 		}
-	};
+	}
+};
 
 export default getState;
