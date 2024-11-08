@@ -469,8 +469,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			},			
-
-			},
 			logout: () => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
@@ -479,6 +477,5 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		}
 	};
-};
 
 export default getState;
