@@ -62,12 +62,12 @@ export const Transactions = () => {
 	}
 
 	const formatDate = (date) => {
-        const parsedDate = new Date(date);
-        const year = parsedDate.getFullYear();
-        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(parsedDate.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`; 
-    };
+		const parsedDate = new Date(date);
+		const year = parsedDate.getFullYear();
+		const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+		const day = String(parsedDate.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	};
 
 	const editTransaction = async (item) => {
 		const itemEdited = {
@@ -86,7 +86,7 @@ export const Transactions = () => {
 
 	const applyFilter = (criteria, value) => {
 		if (value === "") {
-			setFilteredTransactions(store.transactions); 
+			setFilteredTransactions(store.transactions);
 		} else {
 			const filtered = store.transactions.filter((transaction) => {
 				if (criteria === 'source') {
@@ -104,9 +104,9 @@ export const Transactions = () => {
 	};
 
 	const handleFilterSelection = (filterType) => {
-		setSelectedFilterType(filterType); 
-		setFilterValue(''); 
-		setFilteredTransactions(store.transactions); 
+		setSelectedFilterType(filterType);
+		setFilterValue('');
+		setFilteredTransactions(store.transactions);
 	};
 
 	const handleFilterValueChange = (event) => {
@@ -224,36 +224,41 @@ export const Transactions = () => {
 						</div>
 					</div>
 					<div className="mb-2">
-						{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
-							(<div className="d-flex flex-row align-items-center justify-content-center">
-								<div className="card p-2 stat me-3 d-flex flex-row align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-									<div className="m-1">
+						<div className="d-flex flex-row align-items-center justify-content-center">
+							<div className="card p-2 stat me-3 d-flex flex-row align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
+									(<div className="m-1">
 										<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
-									</div>
-									<div >
-										<p> Income <br />
-											€{store.balance.monthly_income}</p>
-									</div>
-								</div>
-								<div className="card p-2 stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-									<div className="m-1">
+										<div >
+											<p> Income <br />
+												€{store.balance.monthly_income}</p>
+										</div>
+									</div>)}
+							</div>
+							<div className="card p-2 stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
+									(<div className="m-1">
 										<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
-									</div>
-									<div >
-										<p> Expenses <br />
-											€{store.balance.monthly_expenses}</p>
-									</div>
-								</div>
-								<div className="card p-2  stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-								<div className="m-1">
-								<FontAwesomeIcon icon={faChartLine}  style={{ color: "#ea1a2f", fontSize: "2rem" }} />
-									</div>
-									<div>
-										<p> Balance <br />
-											€{store.balance.total_balance}</p>
-									</div>
-								</div>
-							</div>)}
+
+										<div >
+											<p> Expenses <br />
+												€{store.balance.monthly_expenses}</p>
+										</div>
+									</div>)}
+							</div>
+
+							<div className="card p-2  stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
+								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
+									(<div className="m-1">
+										<FontAwesomeIcon icon={faChartLine} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+
+										<div>
+											<p> Balance <br />
+												€{store.balance.total_balance}</p>
+										</div>
+									</div>)}
+							</div>
+						</div>
 					</div>
 				</header>
 				<TransactionsChart />
