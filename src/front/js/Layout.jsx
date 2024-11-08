@@ -22,6 +22,7 @@ import { EditTransaction } from "./pages/EditTransaction.jsx";
 import { Error404 } from "./pages/Error404.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
+
 // Layout con Navbar y Footer
 const NavbarFooterLayout = () => (
     <div className="d-flex flex-column min-vh-100">

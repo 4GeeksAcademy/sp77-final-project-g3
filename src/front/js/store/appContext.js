@@ -37,6 +37,7 @@ const injectContext = PassedComponent => {
 			state.actions.getSources();
 			state.actions.getBalance();
 			state.actions.getCategories();
+			
 
 			// Calling this function from the flux.js actions
 		}, []);

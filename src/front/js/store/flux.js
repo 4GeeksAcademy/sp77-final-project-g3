@@ -389,7 +389,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error en la conexión al backend:", error);
 				}
-			},
+			},								
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("jwt_token");
@@ -479,6 +479,5 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		}
 	};
-
 
 export default getState;
