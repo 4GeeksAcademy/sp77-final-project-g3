@@ -8,19 +8,21 @@ import userImg from "../../img/user-img.png";
 import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
 
 export const Sidebar = () => {
-    const { store } = useContext(Context);
+    const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         try {
             await doSignOut();
             console.log("User logged out");
-            navigate('/')
-
+            actions.logout(); // Llama al logout del Flux para limpiar el store y localStorage
+            navigate('/'); // Redirige al usuario después de la limpieza
         } catch (error) {
             console.error("Error logging out:", error.message);
         }
     };
+
+    const profileImage = store.user?.photo_url || userImg;
 
     return (
         <div className="sidebar-container">
@@ -81,7 +83,7 @@ export const Sidebar = () => {
             <hr />
             <div className="dropdown mb-3 ms-2">
                 <a href="#" className="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src={userImg} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
+                    <img src={profileImage} alt="User profile" width="32" height="32" className="rounded-circle me-2" />
                     <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                 </a>
                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">

@@ -3,7 +3,7 @@ import "../../styles/index.css";
 
 
 export const Footer = () => (
-	<footer className="footer mt-auto mb-2 text-center bg-warning">
+	<footer className="mt-auto text-center bg-warning">
 		<p className="text-dark fw-bold">
 			© ExpenseVue <br />
 			Made by 
