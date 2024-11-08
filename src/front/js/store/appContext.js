@@ -32,8 +32,8 @@ const injectContext = PassedComponent => {
 		useEffect(() => {
 			state.actions.getToken();
 			state.actions.getTransactions();
-			state.actions.getBudgets();
-			state.actions.getFixedExpenses();
+			// state.actions.getBudgets();
+			// state.actions.getFixedExpenses();
 			state.actions.getSources();
 			state.actions.getBalance();
 			state.actions.getCategories();

@@ -14,6 +14,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: '',
 			sources: [],
 			categories: [],
+			currentTransaction: {},
 		},
 
 		actions: {
@@ -146,7 +147,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				getActions().getuser();
 			},
-			setCurrentTransaction: (transaction) => { setStore({ transactions: transaction }) },
+			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;
 				const token = localStorage.getItem("jwt_token");
@@ -176,27 +177,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("estas son las transactions", getStore().transactions)
 
 			},
-			createTransaction: async (loginData) => {
-				const uri = ``;
+			createTransaction: async (transactionData) => {
+				const uri = `${getStore().host}/api/transactions`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(loginData),
+					headers: { 
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`},
+					body: JSON.stringify(transactionData),
 				}
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error:', error.status, error.statusText);
 					return
 				}
-
+				const data = await response.json();
 				getActions().getTransactions();
 			},
 			editTransaction: async (id, dataToSend) => {
-				const uri = ``;
+				const uri = `${getStore().host}/api/transactions/${id}`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`,
 					},
 					body: JSON.stringify(dataToSend),
 				};
@@ -209,16 +215,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getTransactions();
 			},
 			deleteTransaction: async (id) => {
-				const uri = ``;
+				const uri = `${getStore().host}/api/transactions/${id}`;
+				const token = localStorage.getItem("jwt_token");
 				const options = {
 					method: 'DELETE',
-				};
+					headers: {
+					  'Authorization': `Bearer ${token}`,
+					},
+				  };
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error:', response.status, response.statusText);
 					return
 				};
-				getActions().getTransaction();
+				getActions().getTransactions();
 			},
 			setCurrentBudget: (Budget) => { setStore({ Budget: Budget }) },
 			getBudgets: async () => {

@@ -19,6 +19,7 @@ import { Connections } from "./pages/Connections.jsx"
 import { Contact } from "./pages/Contact.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 import { Profile } from "./pages/Profile.jsx";
+import { EditTransaction } from "./pages/EditTransaction.jsx";
 
 // Create your first component
 const Layout = () => {
@@ -105,6 +106,13 @@ const Layout = () => {
                             <div className="main-content">
                                 <Sidebar />
                                 <Profile />
+                            </div>
+                        }
+                        />
+                        <Route path="/edit-transaction" element={ 
+                            <div className="main-content">
+                                <Sidebar />
+                                <EditTransaction />
                             </div>
                         }
                         />

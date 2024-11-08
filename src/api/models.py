@@ -128,8 +128,8 @@ class Transactions(db.Model):
                 'date': self.date,
                 'source_id': self.source_id,
                 'category_id': self.category_id,
-                'source': self.source_to.serialize() if self.source_to else None } # esto me permite acceso a los datos de source
-
+                'source': self.source_to.serialize() if self.source_to else None, # esto me permite acceso a los datos de source
+                'category': self.category_to.serialize() if self.category_to else None} 
 
 class FixedExpenses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
