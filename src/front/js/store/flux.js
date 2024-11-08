@@ -148,7 +148,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;
-				const token = localStorage.getItem("jwt_token");
+				const token = getStore().token
 
 				console.log("URI de la solicitud:", uri);
 				console.log("Token utilizado:", token);
@@ -177,7 +177,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			createTransaction: async (transactionData) => {
 				const uri = `${getStore().host}/api/transactions`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 				const options = {
 					method: 'POST',
 					headers: {
@@ -196,7 +196,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			editTransaction: async (id, dataToSend) => {
 				const uri = `${getStore().host}/api/transactions/${id}`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 				const options = {
 					method: 'PUT',
 					headers: {
@@ -215,7 +215,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			deleteTransaction: async (id) => {
 				const uri = `${getStore().host}/api/transactions/${id}`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 				const options = {
 					method: 'DELETE',
 					headers: {
@@ -232,7 +232,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			setCurrentBudget: (Budget) => { setStore({ Budget: Budget }) },
 			getBudgets: async () => {
 				const uri = `${getStore().host}/api/budgets`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 
 				const options = {
 					method: 'GET',
@@ -298,7 +298,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getFixedExpenses: async () => {
 				const uri = `${getStore().host}/api/fixed-expenses`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 
 				const options = {
 					method: 'GET',
@@ -332,7 +332,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getBalance: async () => {
 				const uri = `${getStore().host}/api/balances`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 
 				const options = {
 					method: 'GET',
@@ -393,7 +393,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 
 				const options = {
 					method: 'GET',
@@ -415,7 +415,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getCategories: async () => {
 				const uri = `${getStore().host}/api/categories`;
-				const token = localStorage.getItem("jwt_token");
+				const token = localStorage.getItem("token");
 
 				const options = {
 					method: 'GET',
