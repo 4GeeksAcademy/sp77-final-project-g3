@@ -14,7 +14,7 @@ export const Login = () => {
         const dataToSend = { email, password }
         console.log(dataToSend);
         actions.login(dataToSend);
-        navigate('/profile')
+        navigate('/dashboard')
     }
     return (
         <div className="d-flex justify-content-center align-items-center">
