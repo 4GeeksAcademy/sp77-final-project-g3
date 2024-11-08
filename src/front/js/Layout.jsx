@@ -19,6 +19,7 @@ import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Profile } from "./pages/Profile.jsx";
 import { EditTransaction } from "./pages/EditTransaction.jsx";
+import { Categories } from "./pages/Categories.jsx";
 import { Error404 } from "./pages/Error404.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
@@ -50,91 +51,6 @@ const Layout = () => {
             <BrowserRouter basename={basename}>
                 <ScrollToTop>
                     <Routes>
-                        {/* Páginas con solo Navbar y Footer*/}
-                        <Route path="/" element={
-                            <>
-                                <Navbar />
-                                <Home />
-                                <Footer />
-                            </>
-                        }
-                        />
-                        <Route path="/login" element={
-                            <>
-                                <Navbar />
-                                <Login />
-                                <Footer />
-                            </>
-                        }
-                        />
-                        <Route path="/faq" element={
-                            <>
-                                <Navbar />
-                                <Faq />
-                                <Footer />
-                            </>
-                        }
-                        />
-                        <Route path="/contact" element={
-                            <>
-                                <Navbar />
-                                <Contact />
-                                <Footer />
-                            </>
-                        }
-                        />
-                        {/* Otras rutas con solo Sidebar */}
-                        <Route path="/dashboard" element={
-                            <div className="main-content">
-                                <Sidebar />
-                                <Dashboard />
-                            </div>
-                        }
-                        />
-                        <Route path="/transactions" element={
-                            <div className="main-content">
-                                <Sidebar />
-                                <Transactions />
-                            </div>
-                        }
-                        />
-                        <Route path="/budgets" element={
-                            <div className="main-content">
-                                <Sidebar />
-                                <Budgets />
-                            </div>
-                        }
-                        />
-                        <Route path="/balance" element={
-                            <div className="main-content">
-                                <Sidebar />
-                                <Balance />
-                            </div>
-                        }
-                        />
-                        <Route path="/connections" element={
-                            <div className="main-content">
-                                <Sidebar />
-                                <Connections />
-                            </div>
-                        }
-                        />
-                        <Route path="/profile" element={ 
-                            <div className="main-content">
-                                <Sidebar />
-                                <Profile />
-                            </div>
-                        }
-                        />
-                        <Route path="/edit-transaction" element={ 
-                            <div className="main-content">
-                                <Sidebar />
-                                <EditTransaction />
-                            </div>
-                        }
-                        />
-                        <Route path="*" element={<h1>Not found!</h1>} />
-
                         {/* Rutas con Navbar y Footer */}
                         <Route element={<NavbarFooterLayout />}>
                             <Route path="/" element={<Home />} />
@@ -142,7 +58,6 @@ const Layout = () => {
                             <Route path="/faq" element={<Faq />} />
                             <Route path="/contact" element={<Contact />} />
                         </Route>
-
                         {/* Rutas con Sidebar */}
                         <Route element={<SidebarLayout />}>
                             <Route path="/dashboard" element={<Dashboard />} />
@@ -151,11 +66,11 @@ const Layout = () => {
                             <Route path="/balance" element={<Balance />} />
                             <Route path="/connections" element={<Connections />} />
                             <Route path="/profile" element={<Profile />} />
+                            <Route path="/edit-transaction" element={<EditTransaction  />} />
+                            <Route path="/categories" element={<Categories />} />
                         </Route>
-
                         {/* Ruta para Not Found */}
                         <Route path="*" element={<Error404 />} />
-
                     </Routes>
                 </ScrollToTop>
             </BrowserRouter>
