@@ -468,8 +468,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 
-			},
-			},				
+			},			
 
 			},
 			logout: () => {
@@ -480,6 +479,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 		}
 	};
-};
+
 
 export default getState;
