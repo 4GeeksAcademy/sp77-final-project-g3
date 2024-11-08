@@ -469,6 +469,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 
 			},			
+
+			},
 			logout: () => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
