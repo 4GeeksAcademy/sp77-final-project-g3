@@ -135,25 +135,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			deleteUser: async (id) => {
 				try {
-					const store = getStore(); 
+					const store = getStore();
 					const uri = `${process.env.BACKEND_URL}/api/users/${id}`;
 					console.log("URL de eliminación:", uri);
-			
+
 					const options = {
 						method: 'DELETE',
 						headers: {
-							'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+							'Authorization': `Bearer ${localStorage.getItem('token')}`,
 							'Content-Type': 'application/json',
 						},
 					};
-			
+
 					const response = await fetch(uri, options);
-					
+
 					if (!response.ok) {
 						console.log('Error en la respuesta:', response.status, response.statusText);
 						return false;
 					}
-					
+
 					console.log('Usuario eliminado exitosamente');
 					getActions().logout();
 					return true;
@@ -161,7 +161,113 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log('Error de red:', error);
 					return false;
 				}
-			},					
+			},
+			getInstitutions: async () => {
+				const uri = `${getStore().host}/api/institutions`;
+				const response = await fetch(uri);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return;
+				};
+				const data = await response.json();
+				setStore({ institutions: data.results })
+			},
+			createYapilyUser: async (id) => {
+				const uri = `${getStore().host}/api/yapily-connection`;
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json;charset=UTF-8',
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					},
+					body: JSON.stringify({
+						applicationUserId: `ExpenseVue${id}`
+					})
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				console.log(data);
+				return true;
+			},
+			getBankAuthorization: async (code) => {
+				const uri = `${getStore().host}/api/account-auth-requests`;
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json;charset=UTF-8',
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					},
+					body: JSON.stringify({
+						applicationUserId: getStore().user.yapily_id,
+						institutionId: code,
+						callback: "https://display-parameters.com/"
+					})
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				return data;
+			},
+			getConsentToken: async () => {
+				const uri = `${getStore().host}/api/consent-token`;
+				const options = {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					}
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				console.log(data);
+				return true;
+			},
+			getBankAccounts: async (consent) => {
+				const uri = `${getStore().host}/api/accounts`;
+				const options = {
+					method: 'GET',
+					headers: {
+						'consent': consent,
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					}
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				console.log(data);
+				return true;
+			},
+			getYapilyTransactions: async (consent) => {
+				const uri = `${getStore().host}/api/yapily-transactions`;
+				const options = {
+					method: 'GET',
+					headers: {
+						'consent': consent,
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					}
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				console.log(data);
+				return true;
+			},
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;

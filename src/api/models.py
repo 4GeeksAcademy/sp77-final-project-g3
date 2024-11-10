@@ -36,8 +36,8 @@ class Institutions(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('institution_to', lazy='select'))
 
-    def _repr_(self):
-        return f'<Institution {self.name}>'
+    def __repr__(self):
+        return f'<Institution {self.name} - {self.code}>'
     
     def serialize(self):
         return {'id': self.id,

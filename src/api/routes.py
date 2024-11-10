@@ -104,6 +104,7 @@ def institutions():
     response = requests.get(url, auth=(yapily_id, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     institutions_list = response.json()
     data = institutions_list.get('data')
@@ -128,18 +129,57 @@ def yapily_connection():
     current_user = get_jwt_identity()
     user = Users.query.filter_by(id=current_user['user_id']).first()
     url = "https://api.yapily.com/users"
+    payload = {
+        "applicationUserId": f"ExpenseVue{user.id}"
+    }
     headers = {
         "Content-Type": "application/json;charset=UTF-8"
     }
-    response = requests.post(url, headers=headers, auth=(yapily_id, yapily_secret))
-    if response.status_code != 200:
+    response = requests.post(url, json=payload, headers=headers, auth=(yapily_id, yapily_secret))
+    if response.status_code != 201:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     data = response.json()
-    app_id = data.get('applicationUserId')
-    user.yapily_id = app_id
+    user.yapily_id = data.get('applicationUserId')
     db.session.commit()
-    response_body['message'] = "The connection with Yapily was created!"
+    response_body['message'] = "User created in Yapily"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/yapily-users', methods=['GET'])
+def yapily_users():
+    response_body = {}
+    url = "https://api.yapily.com/users"
+    response = requests.get(url, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
+        return response_body, 400
+    data = response.json()
+    if not data:
+        response_body['message'] = "No users found in Yapily."
+        response_body['results'] = []
+        return response_body, 400
+    response_body['message'] = "These are all the current Yapily users within the app"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/yapily-user', methods=['DELETE'])
+def remove_yapily_user():
+    response_body = {}
+    user_uuid = ''
+    url = "https://api.yapily.com/users/" + user_uuid
+    response = requests.delete(url, auth=(yapily_id, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "These are all the current Yapily users within the app"
+    response_body['results'] = data.get('data')
     return response_body, 200
 
 
@@ -149,13 +189,15 @@ def account_auth_requests():
     response_body = {}
     current_user = get_jwt_identity()
     user = Users.query.filter_by(id=current_user['user_id']).first()
-    institution_id = request.args.get('institution_id')
-    institution = Institutions.query.filter_by(id=institution_id).first()
+    front_data = request.get_json()
+    application_user_id = front_data.get('applicationUserId')
+    institution_id = front_data.get('institutionId')
+    callback = front_data.get('callback')
     url = 'https://api.yapily.com/account-auth-requests'
     payload = {
-        "applicationUserId": user.yapily_id,
-        "institutionId": institution.code,
-        "callback": "https://display-parameters.com/"
+        "applicationUserId": application_user_id,
+        "institutionId": institution_id,
+        "callback": callback
     }
     headers = {
         "Content-Type": "application/json;charset=UTF-8"
@@ -163,16 +205,34 @@ def account_auth_requests():
     query = {
         "raw": "true"
     }
-    response = requests.get(url, json=payload, headers=headers, params=query, auth=(yapily_id, yapily_secret))
-    if response.status_code != 200:
+    response = requests.post(url, json=payload, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    if response.status_code != 201:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     data = response.json()
-    consent = data.get('institutionConsentId')
-    institution.consent = consent
+    authorisation_url = data.get('data').get('authorisationUrl')
+    institution = Institutions.query.filter_by(code=institution_id).first()
+    institution.consent = data.get('data').get('institutionConsentId')
     institution.user_id = user.id
     db.session.commit()
-    response_body['message'] = "You received the authorization for this institution!"
+    return {"authorisationUrl": authorisation_url}, 200
+
+
+@api.route('/consent-token', methods=['GET'])
+@jwt_required()
+def consent_token():
+    response_body = {}
+    front_data = request.get_json()
+    consent_id = front_data.get('consent_id')
+    url = "https://api.yapily.com/consents/" + consent_id
+    response = requests.get(url, auth=(yapily_id, yapily_secret))
+    data = response.json()
+    institution = Institutions.query.filter_by(consent_id=consent_id).first()
+    institution.consent_token = data.get('data').get('consentToken')
+    db.session.commit()
+    response_body['message'] = "This is the consent token for the institution"
+    response_body['results'] = data
     return response_body, 200
 
 
@@ -181,11 +241,11 @@ def account_auth_requests():
 def accounts():
     response_body = {}
     current_user = get_jwt_identity()
-    institution_id = request.args.get('institution_id')
-    institution = Institutions.query.filter_by(id=institution_id, user_id=current_user.get('user_id')).first()
+    consent = request.headers.get('consent')
+    institution = Institutions.query.filter_by(consent=consent).first()
     url = 'https://api.yapily.com/accounts'
     headers = {
-        "consent": institution.consent
+        "consent": consent
     }
     query = {
         "raw": "true"
@@ -193,6 +253,7 @@ def accounts():
     response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     accounts_list = response.json()
     data = accounts_list.get('data')
@@ -231,6 +292,7 @@ def yapily_transactions():
     response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     transactions_list = response.json()
     data = transactions_list.get('data')
