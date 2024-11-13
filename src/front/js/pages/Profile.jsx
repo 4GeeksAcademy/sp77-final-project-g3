@@ -52,8 +52,22 @@ export const Profile = () => {
         const success = await actions.updateUser(formData.id, formData);
         if (success) {
             setIsEditing(false);
+            window.location.reload();
         } else {
             setError("Error en la actualización");
+        }
+    };
+
+    const handleDeleteClick = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
+        if (confirmed) {
+            const success = await actions.deleteUser(store.user.id);
+            if (success) {
+                console.log("Usuario eliminado y redirigido.");
+                window.location.href = "/";  //
+            } else {
+                setError("Error al intentar eliminar la cuenta.");
+            }
         }
     };
 
@@ -94,10 +108,10 @@ export const Profile = () => {
     if (error) return <div className="alert alert-danger">{error}</div>;
 
     return (
-        <div className="container py-5">
+        <div className="container py-2">
             <div className="text-center mb-4">
                 <h2>Welcome {store.user?.first_name}</h2>
-                <p className="text-muted">
+                <p className="text-dark">
                     Here, you can view and manage your personal details, including your name, email, and phone number.
                     Keep your profile up-to-date to ensure a seamless experience across our platform.
                 </p>
@@ -150,6 +164,12 @@ export const Profile = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="text-center mb-4">
+                <p className="text-dark">
+                If you wish to stop using our services, you can permanently delete your account. Please note that this action cannot be undone, and all your data will be removed. To proceed, click the "Delete Account" button below.
+                </p>
+                <button onClick={handleDeleteClick} className="btn btn-danger" style={{ fontWeight:'bold' }}>Delete Account</button>
             </div>
         </div>
     );

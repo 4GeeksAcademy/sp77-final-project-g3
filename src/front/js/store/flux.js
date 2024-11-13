@@ -134,17 +134,34 @@ const getState = ({ getStore, getActions, setStore }) => {
 				getActions().getuser();
 			},
 			deleteUser: async (id) => {
-				const uri = ``;
-				const options = {
-					method: 'DELETE',
-				};
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				};
-				getActions().getuser();
-			},
+				try {
+					const store = getStore(); 
+					const uri = `${process.env.BACKEND_URL}/api/users/${id}`;
+					console.log("URL de eliminación:", uri);
+			
+					const options = {
+						method: 'DELETE',
+						headers: {
+							'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+							'Content-Type': 'application/json',
+						},
+					};
+			
+					const response = await fetch(uri, options);
+					
+					if (!response.ok) {
+						console.log('Error en la respuesta:', response.status, response.statusText);
+						return false;
+					}
+					
+					console.log('Usuario eliminado exitosamente');
+					getActions().logout();
+					return true;
+				} catch (error) {
+					console.log('Error de red:', error);
+					return false;
+				}
+			},					
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;
