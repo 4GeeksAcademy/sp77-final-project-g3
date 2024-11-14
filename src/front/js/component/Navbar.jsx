@@ -1,22 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
+import { Context } from "../store/appContext";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import { useAuth } from "../../../contexts/authContext/index.jsx";
-import { doSignOut } from "../../../firebase/auth"; // Import sign-out function
+import { doSignOut } from "../../../firebase/auth"; 
 
 export const Navbar = () => {
-  
+    const { store, actions } = useContext(Context);
+    const { user, isLogged } = store;
     const { currentUser } = useAuth(); 
+
     const handleLogout = async () => {
         try {
-            await doSignOut();
+            await actions.logout();
             console.log("User logged out");
+            window.location.reload(); // Recarga la página
         } catch (error) {
             console.error("Error logging out:", error.message);
+            window.alert("An error occurred during logout. Please try again.");
         }
     };
-
 
     return (
         <nav className="navbar navbar-expand-lg navbar-light" aria-label="Offcanvas navbar large" style={{ backgroundColor: '#ffc107' }}>
@@ -34,14 +38,6 @@ export const Navbar = () => {
                     </div>
                     <div className="offcanvas-body">
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
-                            <li>
-                                {currentUser && (
-                                    <Link to="/dashboard">
-                                        <button id="boton-logout" className="btn fw-bold">
-                                            dashboard
-                                        </button>
-                                    </Link>)}
-                            </li>
                             <li className="nav-item">
                                 <Link className="nav-link fw-bold" to="/">
                                     Home
@@ -57,8 +53,17 @@ export const Navbar = () => {
                                     Contact
                                 </Link>
                             </li>
+                            {isLogged && (
+                                <li className="nav-item me-2">
+                                    <Link to="/dashboard">
+                                        <button id="boton-dashboard" className="btn fw-bold">
+                                            Go to Dashboard
+                                        </button>
+                                    </Link>
+                                </li>
+                            )}
                             <li className="nav-item">
-                                {currentUser ? (
+                                {isLogged ? (
                                     <button id="boton-logout" className="btn fw-bold" onClick={handleLogout}>
                                         Logout
                                     </button>
