@@ -12,6 +12,11 @@ li {
     color: #E2E8F0
 }
 
+#boton-dashboard {
+    background-color: #E2E8F0;
+    color: #2D3748!important;
+}
+
 /* Para pantallas más grandes (por encima de 1024px) */
 .navbar .nav-link {
     color: #2D3748 !important;
