@@ -14,6 +14,8 @@ class Users(db.Model):
     phone_number = db.Column(db.String(), unique=False, nullable=True)
     photo_url = db.Column(db.String(), unique=False, nullable=True)
     yapily_id = db.Column(db.String(), unique=True, nullable=True)
+    reset_token = db.Column(db.String(64), nullable=True)
+    token_expiration = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return f'<User {self.id} - {self.email}>'

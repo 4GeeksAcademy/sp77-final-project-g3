@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from api.models import db, Users, Institutions, Sources, Balances, Categories, Transactions, FixedExpenses, Budgets
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
@@ -14,6 +14,9 @@ import os
 import requests
 import cloudinary
 import cloudinary.uploader
+import secrets
+import smtplib
+from email.mime.text import MIMEText
 
 
 api = Blueprint('api', __name__)
@@ -625,3 +628,87 @@ def upload():
         print('-------------la url donde esta la imagen-------------', image_url)
         return jsonify({"url": image_url}), 200  # Retorna solo la URL de la imagen
     return jsonify({"error": "No file uploaded"}), 400
+
+
+def generate_reset_token():
+    return secrets.token_urlsafe(16)
+
+def send_reset_email(email, reset_link):
+    sender_email = "expensevue.sp77@gmail.com"
+    sender_password = "jmca cpzh kizy xtal" # Clave para aplicaciones
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    message = MIMEText(f"To reset your password, visit the following link: {reset_link}\n\nIf you did not request this, please ignore this email.")
+    message["Subject"] = "Password Reset Request"
+    message["From"] = sender_email
+    message["To"] = email
+
+    try:
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, email, message.as_string())
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+@api.route('/forgot-password', methods=['POST'])
+def password_recovery():
+    response_body = {}
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        response_body['message'] = 'Email is required.'
+        return jsonify(response_body), 400
+
+    user = db.session.execute(db.select(Users).where(Users.email == email)).scalar()
+
+    if not user:
+        response_body['message'] = 'Email not registered.'
+        response_body['results'] = {}
+        return jsonify(response_body), 404
+
+    try:
+        reset_token = generate_reset_token()
+        frontend_url = os.getenv('FRONTEND_URL')
+        if not frontend_url.endswith('/'):
+            frontend_url += '/'
+        reset_link = f"{frontend_url}reset-password?token={reset_token}"
+        user.reset_token = reset_token
+        user.token_expiration = datetime.utcnow() + timedelta(hours=1)
+        db.session.commit()
+        send_reset_email(email, reset_link)
+        response_body['message'] = 'Recovery email sent.'
+        response_body['results'] = {}
+        return jsonify(response_body), 200
+
+    except Exception as e:
+        print(f"Error in password recovery: {e}")
+        db.session.rollback()
+        response_body['message'] = 'Error sending recovery email.'
+        response_body['results'] = {}
+        return jsonify(response_body), 500
+
+
+@api.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
+    token = data.get('token')
+    new_password = data.get('new_password')
+
+    if not token or not new_password:
+        return jsonify({'message': 'Token and new password are required.'}), 400
+
+    user = db.session.execute(db.select(Users).where(Users.reset_token == token)).scalar()
+
+    if not user or user.token_expiration < datetime.utcnow():
+        return jsonify({'message': 'Invalid or expired token.'}), 400
+
+    user.password = new_password  
+    user.reset_token = None  
+    user.token_expiration = None
+    db.session.commit()
+
+    return jsonify({'message': 'Password has been reset successfully.'}), 200
