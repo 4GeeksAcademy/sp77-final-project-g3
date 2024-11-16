@@ -16,14 +16,29 @@ export const Transactions = () => {
 	const [description, setDescription] = useState('')
 	const [amount, setAmount] = useState('')
 	const [date, setDate] = useState('')
-	const [selectedFilterType, setSelectedFilterType] = useState(null); // Tipo de filtro seleccionado
-	const [filterValue, setFilterValue] = useState(''); // Valor del filtro
+	const [selectedFilterType, setSelectedFilterType] = useState(null);
+	const [filterValue, setFilterValue] = useState('');
 	const [filteredTransactions, setFilteredTransactions] = useState(store.transactions || []); // Estado de transacciones filtradas
 	const navigate = useNavigate();
+	const [currentPage, setCurrentPage] = useState(1);
+	const transactionsPerPage = 10;
+
+	const indexOfLastTransaction = currentPage * transactionsPerPage;
+	const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+	const currentTransactions = filteredTransactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+	const totalPages = Math.ceil(filteredTransactions.length / transactionsPerPage);
+
+	const handlePageChange = (page) => {
+		setCurrentPage(page);
+	};
 
 	useEffect(() => {
 		setFilteredTransactions(store.transactions);
 	}, [store.transactions]);
+
+	useEffect(() => {
+		actions.getCategories();
+	 }, []);
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -31,8 +46,8 @@ export const Transactions = () => {
 		const transactionData = {
 			name: name,
 			type: type,
-			category: category,
-			source: source,
+			category_id: category,
+			source_id: source,
 			description: description,
 			amount: parseFloat(amount),
 			date: date,
@@ -71,6 +86,7 @@ export const Transactions = () => {
 
 	const editTransaction = async (item) => {
 		const itemEdited = {
+			id: item.id,
 			name: item.name,
 			type: item.type,
 			category: item.category.id,
@@ -223,43 +239,64 @@ export const Transactions = () => {
 							</div>
 						</div>
 					</div>
-					<div className="mb-2">
-						<div className="d-flex flex-row align-items-center justify-content-center">
-							<div className="card p-2 stat me-3 d-flex flex-row align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
-									(<div className="m-1">
-										<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
-										<div >
-											<p> Income <br />
-												€{store.balance.monthly_income}</p>
-										</div>
-									</div>)}
-							</div>
-							<div className="card p-2 stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
-									(<div className="m-1">
-										<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+					<div className="row">
 
-										<div >
-											<p> Expenses <br />
-												€{store.balance.monthly_expenses}</p>
-										</div>
-									</div>)}
-							</div>
+						<div className="col">
+							<div className="row g-3">
+								{/* Card Income */}
+								<div className="col-12 col-md-4">
+									<div className="card text-center p-3">
+										{!store.balance || Object.keys(store.balance).length === 0 ? (
+											<div className="m-3"><Spinner /></div>
+										) : (
+											<div>
+												<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Income <br />
+													€{store.balance.monthly_income}
+												</p>
+											</div>
+										)}
+									</div>
+								</div>
 
-							<div className="card p-2  stat me-3 d-flex flex-row  align-items-center justify-content-center" style={{ minWidth: "150px", minHeight: "100px" }}>
-								{!store.balance || Object.keys(store.balance).length === 0 ? <div className="m-3"> <Spinner /> </div> :
-									(<div className="m-1">
-										<FontAwesomeIcon icon={faChartLine} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+								{/* Card Expenses */}
+								<div className="col-12 col-md-4">
+									<div className="card text-center p-3">
+										{!store.balance || Object.keys(store.balance).length === 0 ? (
+											<div className="m-3"><Spinner /></div>
+										) : (
+											<div>
+												<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Expenses <br />
+													€{store.balance.monthly_expenses}
+												</p>
+											</div>
+										)}
+									</div>
+								</div>
 
-										<div>
-											<p> Balance <br />
-												€{store.balance.total_balance}</p>
-										</div>
-									</div>)}
+								{/* Card Balance */}
+								<div className="col-12 col-md-4">
+									<div className="card text-center p-3 align-items-center justify-content-center">
+										{!store.balance || Object.keys(store.balance).length === 0 ? (
+											<div className="m-3"><Spinner /></div>
+										) : (
+											<div>
+												<FontAwesomeIcon icon={faChartLine} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Balance <br />
+													€{store.balance.total_balance}
+												</p>
+											</div>
+										)}
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
+
 				</header>
 				<TransactionsChart />
 				<div className="d-flex justify-content-end mb-3">
@@ -306,7 +343,7 @@ export const Transactions = () => {
 					</div>
 				</div>
 
-				<div className="transactions-list card p-3">
+				<div className="transactions-list card p-3 text-truncate" style={{ overflowX: 'auto' }}>
 					<table>
 						<thead>
 							<tr>
@@ -320,12 +357,13 @@ export const Transactions = () => {
 							</tr>
 						</thead>
 						<tbody>
-							{!filteredTransactions || filteredTransactions.length === 0 ? (
+							{/* Modificación para incluir paginación */}
+							{!currentTransactions || currentTransactions.length === 0 ? (
 								<tr>
 									<td colSpan="4"> <div className="m-3"> <Spinner /> </div></td>
 								</tr>
 							) : (
-								filteredTransactions.map((item, index) => (
+								currentTransactions.map((item, index) => (
 									<tr key={item.id}>
 										<td>{item.name}</td>
 										<td>
@@ -355,6 +393,25 @@ export const Transactions = () => {
 							)}
 						</tbody>
 					</table>
+
+					{/* Paginación */}
+					<nav aria-label="Page navigation" className="mt-3">
+						<ul className="pagination justify-content-center">
+							{Array.from({ length: totalPages }, (_, index) => (
+								<li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
+									<button className="page-link"
+										onClick={() => handlePageChange(index + 1)}
+										style={{
+											backgroundColor: currentPage === index + 1 ? "#2D3748" : "white",
+											color: currentPage === index + 1 ? "white" : "#2D3748",
+											border: `1px solid #2D3748`,
+										}}>
+										{index + 1}
+									</button>
+								</li>
+							))}
+						</ul>
+					</nav>
 				</div>
 			</div>
 		</div>

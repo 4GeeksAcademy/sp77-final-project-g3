@@ -19,6 +19,7 @@ import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Profile } from "./pages/Profile.jsx";
 import { EditTransaction } from "./pages/EditTransaction.jsx";
+import { EditCategory } from "./pages/EditCategory.jsx";
 import { Categories } from "./pages/Categories.jsx";
 import { Error404 } from "./pages/Error404.jsx";
 import { ProtectedRoute } from "./pages/ProtectedRoute.jsx";
@@ -72,6 +73,7 @@ const Layout = () => {
                             <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
                             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                             <Route path="/edit-transaction" element={<ProtectedRoute><EditTransaction /></ProtectedRoute>} />
+                            <Route path="/edit-category" element={<ProtectedRoute><EditCategory /></ProtectedRoute>} />
                             <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
                         </Route>
 
