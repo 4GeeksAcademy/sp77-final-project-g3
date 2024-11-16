@@ -4,11 +4,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			user: JSON.parse(localStorage.getItem('user')) || {},
 			message: null,
 			host: process.env.BACKEND_URL,
+			frontHost: process.env.FRONTEND_URL,
 			email: '',
 			isLogged: Boolean(localStorage.getItem('token')),
 			transactions: [],
 			budgets: [],
 			balance: {},
+			institutions: [],
 			connections: [],
 			fixedExpenses: [],
 			token: localStorage.getItem('token') || '',
@@ -170,10 +172,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return;
 				};
 				const data = await response.json();
-				setStore({ institutions: data.results })
+				setStore({ institutions: data.results });
+			},
+			getConnections: async () => {
+				const uri = `${getStore().host}/api/connections`;
+				const options = {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${localStorage.getItem('token')}`
+					}
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return;
+				};
+				const data = await response.json();
+				console.log("These are the connections", data);
+				setStore({ connections: data.results });
 			},
 			createYapilyUser: async (id) => {
-				const uri = `${getStore().host}/api/yapily-connection`;
+				const uri = `${getStore().host}/api/create-yapily-user`;
 				const options = {
 					method: 'POST',
 					headers: {
@@ -202,9 +222,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					},
 					body: JSON.stringify({
-						applicationUserId: getStore().user.yapily_id,
+						applicationUserId: getStore().user.yapily_username,
 						institutionId: code,
-						callback: "https://display-parameters.com/"
+						callback: `${getStore().frontHost}/connections`
 					})
 				};
 				const response = await fetch(uri, options);
@@ -215,13 +235,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				return data;
 			},
-			getConsentToken: async () => {
+			getConsentToken: async (consent_token, institution_code) => {
 				const uri = `${getStore().host}/api/consent-token`;
 				const options = {
-					method: 'GET',
+					method: 'POST',
 					headers: {
+						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
-					}
+					},
+					body: JSON.stringify({ consentToken: consent_token, institutionCode: institution_code })
 				};
 				const response = await fetch(uri, options);
 				if (!response.ok) {
@@ -229,15 +251,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
-				console.log(data);
-				return true;
+				return data;
 			},
-			getBankAccounts: async (consent) => {
+			getBankAccounts: async (consent_token) => {
 				const uri = `${getStore().host}/api/accounts`;
 				const options = {
 					method: 'GET',
 					headers: {
-						'consent': consent,
+						'consent': consent_token,
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					}
 				};
@@ -250,12 +271,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log(data);
 				return true;
 			},
-			getYapilyTransactions: async (consent) => {
-				const uri = `${getStore().host}/api/yapily-transactions`;
+			getBankTransactions: async (consent, code) => {
+				const uri = `${getStore().host}/api/bank-transactions`;
 				const options = {
 					method: 'GET',
 					headers: {
 						'consent': consent,
+						'code': code,
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					}
 				};
@@ -474,20 +496,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				setStore({ balance: data.results });
 				console.log("este es el balance", getStore().balance)
-			},
-			setCurrentConnections: (connections) => { setStore({ connections: connections }) },
-			getConnections: async () => {
-				const uri = ``
-				const options = {
-					method: 'GET',
-				}
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				}
-				const data = await response.json();
-				setStore({ fixedExpenses: data.results });
 			},
 			getUser: async (id) => {
 				try {
