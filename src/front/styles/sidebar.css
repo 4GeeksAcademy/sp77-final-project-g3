@@ -11,9 +11,6 @@
 }
 
 .sidebar-footer {
-    position: absolute;
-    bottom: 1rem; 
-    width: calc(100% - 2rem);
     color: #2D3748;
     font-weight: bold;
 }

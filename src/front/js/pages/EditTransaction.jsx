@@ -16,6 +16,8 @@ export const EditTransaction = () => {
     const [date, setDate] = useState(currentTransaction.date || '');
     const navigate = useNavigate();
 
+   
+
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -28,10 +30,10 @@ export const EditTransaction = () => {
             amount: parseFloat(amount),
             date: date,
         }
-
-        
-        actions.editContacts(currentTransaction.id, dataToSend);
-
+        console.log("Current transaction:", currentTransaction);
+        console.log("Current transaction id:", currentTransaction.id);
+        actions.editTransaction(currentTransaction.id, dataToSend);
+        actions.getTransactions()
         navigate('/transactions')
     }
 
@@ -111,9 +113,8 @@ export const EditTransaction = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="reset" onClick={handleReset} className="btn btn-danger">Cancel </button>
-                                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Create Transaction</button>
+                                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Edit Transaction</button>
                             </div>
                         </form>
-
     )
 }

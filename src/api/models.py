@@ -15,6 +15,8 @@ class Users(db.Model):
     photo_url = db.Column(db.String(), unique=False, nullable=True)
     yapily_username = db.Column(db.String(), unique=True, nullable=True)
     yapily_id = db.Column(db.String(), unique=True, nullable=True)
+    reset_token = db.Column(db.String(64), nullable=True)
+    token_expiration = db.Column(db.DateTime, nullable=True)
 
     def __repr__(self):
         return f'<User {self.id} - {self.email}>'
@@ -109,18 +111,16 @@ class Balances(db.Model):
 
 class Categories(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type_category = db.Column(db.Enum("income", "expense", name="type_category"), nullable=False)
     name = db.Column(db.String(), unique=False, nullable=False)
     description = db.Column(db.String(), unique=False, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('category_to', lazy='select'))
 
     def __repr__(self):
-        return f'<Category {self.name} - {self.type_category}>'
+        return f'<Category {self.name} - {self.description}>'
 
     def serialize(self):
         return {'id': self.id,
-                'type': self.type_category,
                 'name': self.name,
                 'description': self.description,
                 'user_id': self.user_id}

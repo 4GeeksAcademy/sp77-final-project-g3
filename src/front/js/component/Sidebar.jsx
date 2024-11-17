@@ -62,6 +62,12 @@ export const Sidebar = () => {
                     </Link>
                 </li>
                 <li className="mb-3 ms-2">
+                    <Link className="fw-bold sidebar-link" to="/categories">
+                        <i className="fa-solid fa-layer-group bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
+                        Categories
+                    </Link>
+                </li>
+                <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/connections">
                         <i className="fa-solid fa-circle-nodes bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                         Connections

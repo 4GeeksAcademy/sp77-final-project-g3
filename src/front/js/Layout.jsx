@@ -19,8 +19,12 @@ import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Profile } from "./pages/Profile.jsx";
 import { EditTransaction } from "./pages/EditTransaction.jsx";
+import { EditCategory } from "./pages/EditCategory.jsx";
 import { Categories } from "./pages/Categories.jsx";
 import { Error404 } from "./pages/Error404.jsx";
+import { ProtectedRoute } from "./pages/ProtectedRoute.jsx";
+import { PasswordRecovery } from "./pages/PasswordRecovery.jsx";
+import { ResetPassword } from "./pages/ResetPassword.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
 
@@ -28,7 +32,7 @@ import { AuthProvider } from "../../contexts/authContext/index.jsx";
 const NavbarFooterLayout = () => (
     <div className="d-flex flex-column min-vh-100">
         <Navbar />
-        <Outlet /> 
+        <Outlet />
         <Footer />
     </div>
 );
@@ -37,7 +41,7 @@ const NavbarFooterLayout = () => (
 const SidebarLayout = () => (
     <div className="main-content">
         <Sidebar />
-        <Outlet /> 
+        <Outlet />
     </div>
 );
 
@@ -57,18 +61,22 @@ const Layout = () => {
                             <Route path="/login" element={<Login />} />
                             <Route path="/faq" element={<Faq />} />
                             <Route path="/contact" element={<Contact />} />
+                            <Route path="/forgot-password" element={<PasswordRecovery />} />
+                            <Route path="/reset-password" element={<ResetPassword />} />
                         </Route>
                         {/* Rutas con Sidebar */}
                         <Route element={<SidebarLayout />}>
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/transactions" element={<Transactions />} />
-                            <Route path="/budgets" element={<Budgets />} />
-                            <Route path="/balance" element={<Balance />} />
-                            <Route path="/connections" element={<Connections />} />
-                            <Route path="/profile" element={<Profile />} />
-                            <Route path="/edit-transaction" element={<EditTransaction  />} />
-                            <Route path="/categories" element={<Categories />} />
+                            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                            <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
+                            <Route path="/budgets" element={<ProtectedRoute><Budgets /></ProtectedRoute>} />
+                            <Route path="/balance" element={<ProtectedRoute><Balance /></ProtectedRoute>} />
+                            <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
+                            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            <Route path="/edit-transaction" element={<ProtectedRoute><EditTransaction /></ProtectedRoute>} />
+                            <Route path="/edit-category" element={<ProtectedRoute><EditCategory /></ProtectedRoute>} />
+                            <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
                         </Route>
+
                         {/* Ruta para Not Found */}
                         <Route path="*" element={<Error404 />} />
                     </Routes>

@@ -16,6 +16,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: localStorage.getItem('token') || '',
 			sources: [],
 			categories: [],
+			currentCategory: [],
 			currentTransaction: {},
 		},
 
@@ -31,14 +32,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				};
 				const response = await fetch(uri, options);
 				if (!response.ok) {
-					console.log('Error', response.status, response.statusText);
-					return;
+					const error = await response.json();
+					setStore({ message: "Incorrect username or password" });
+					return false;
 				}
 				const data = await response.json();
 				localStorage.setItem('token', data.access_token);
 				localStorage.setItem('user', JSON.stringify(data.results));
-				setStore({ token: data.access_token, user: data.results, isLogged: true });
-			},
+				setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
+				return true;
+			},			
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
@@ -657,6 +660,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
 			},
+			createCategory: async (transactionData) => {
+				const uri = `${getStore().host}/api/categories`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify(transactionData),
+				}
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', error.status, error.statusText);
+					return
+				}
+				const data = await response.json();
+				getActions().getCategories();
+			},
+			setCurrentCategory: (category) => { setStore({ currentCategory: category }) },
+			editCategory: async (id, dataToSend) => {
+				const uri = `${getStore().host}/api/categories/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`,
+					},
+					body: JSON.stringify(dataToSend),
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				}
+				getActions().setCurrentCategory({});
+				getActions().getCategories();
+			},
+			deleteCategory: async (id) => {
+				const uri = `${getStore().host}/api/categories/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				};
+				getActions().getCategories();
+			},
 			updateUser: async (id, userData) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/users/${id}`, {
@@ -683,7 +741,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 				localStorage.removeItem('token');
 				localStorage.removeItem('user');
 				setStore({ token: '', user: {}, isLogged: false });
-			}
+			},
+			passwordRecovery: async (email) => {
+				const uri = `${process.env.BACKEND_URL}/api/forgot-password`;
+			
+				const response = await fetch(uri, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email })
+				});
+			
+				const data = await response.json();
+			
+				if (response.ok) {
+					setStore({ message: "You will receive password reset instructions." });
+				} else {
+					throw new Error(data.message || 'An error occurred, please try again later.');
+				}
+			},			
+			resetPassword: async (token, newPassword) => {
+				const uri = `${process.env.BACKEND_URL}/api/reset-password`; // Construimos la URL completa
+
+				const response = await fetch(uri, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token, new_password: newPassword }),
+				});
+
+				const data = await response.json();
+
+				if (!response.ok) {
+					throw new Error(data.message || "Failed to reset password.");
+				}
+
+				// Si la respuesta es exitosa, se puede guardar el mensaje de éxito, por ejemplo
+				setStore({ message: data.message || "Password reset successful." });
+			},
+			signup: async (dataToSend) => {
+                const uri = `${process.env.BACKEND_URL}/api/signup`;
+                const options = {
+                    method: 'POST',
+                    headers: { "Content-Type": 'application/json' },
+                    body: JSON.stringify(dataToSend)
+                };
+                const response = await fetch(uri, options);
+                if (!response.ok) {
+                    const error = await response.json();
+                    setStore({ message: error.message || "Error in signup process" });
+                    return false;
+                }
+                const data = await response.json();
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('user', JSON.stringify(data.results));
+                setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
+                return true;
+            }
 		}
 	}
 };
