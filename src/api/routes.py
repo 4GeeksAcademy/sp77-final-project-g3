@@ -140,6 +140,21 @@ def connections():
     return response_body, 200
 
 
+@api.route('/connections/<int:id>', methods=['DELETE'])
+@jwt_required()
+def connection(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Connections).where(Connections.user_id == current_user['user_id'], Connections.id == id)).scalar()
+    db.session.execute(db.delete(Transactions).where(Transactions.source_id.in_(db.session.execute(db.select(Sources.id).where(Sources.connection_id == id)).scalars())))
+    db.session.execute(db.delete(Sources).where(Sources.connection_id == id))
+    db.session.delete(row)
+    db.session.commit()
+    response_body['message'] = "The connection was deleted (DELETE)"
+    response_body['results'] = {}
+    return response_body, 200
+
+
 @api.route('/create-yapily-user', methods=['POST'])
 @jwt_required()
 def create_yapily_user():
@@ -358,7 +373,7 @@ def sources():
         row = Sources(name = data.get('name'),
                       type_source = data.get('type_source'),
                       amount = data.get('amount'),
-                      user_id = data.get('user_id'))
+                      user_id = current_user['user_id'])
         db.session.add(row)
         db.session.commit()
         response_body['message'] = "You have a new source (POST)"

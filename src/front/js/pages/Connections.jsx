@@ -14,21 +14,22 @@ export const Connections = () => {
 	const transactions = store.transactions;
 	const [bank, setBank] = useState('');
 	const [confirmingBank, setConfirmingBank] = useState(false);
+	const [name, setName] = useState('');
+	const [type, setType] = useState('');
+	const [amount, setAmount] = useState('');
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 
-
 	useEffect(() => {
 		actions.getConnections();
-        const userId = store.user?.id || localStorage.getItem("user_id");
-        if (userId) {
-            actions.getUser(userId).finally(() => setLoading(false));
-        } else {
-            setError("No se encontró el ID de usuario");
-            setLoading(false);
-        }
-    }, []);
-
+		const userId = store.user?.id || localStorage.getItem("user_id");
+		if (userId) {
+			actions.getUser(userId).finally(() => setLoading(false));
+		} else {
+			setError("No se encontró el ID de usuario");
+			setLoading(false);
+		}
+	}, []);
 
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
@@ -39,12 +40,10 @@ export const Connections = () => {
 		}
 	}, []);
 
-
 	const createYapilyUser = async () => {
 		await actions.createYapilyUser(store.user.id);
 		window.location.reload();
 	};
-
 
 	const handleAuthorization = async (event) => {
 		event.preventDefault();
@@ -63,13 +62,12 @@ export const Connections = () => {
 	const bankConfirmation = () => {
 		const queryParams = new URLSearchParams(location.search);
 		const consentToken = queryParams.get('consent');
-		const institutionId= queryParams.get('institution');
+		const institutionId = queryParams.get('institution');
 		actions.getConsentToken(consentToken, institutionId);
 		setConfirmingBank(false);
 		navigate('/connections');
 		window.location.reload();
 	}
-
 
 	const getBankAccounts = async (consentToken) => {
 		setLoading(true);
@@ -77,12 +75,10 @@ export const Connections = () => {
 		if (success) {
 			alert('Accounts added successfully!');
 			setLoading(false);
-			window.location.reload();
 		} else {
 			alert('The action failed...');
 		}
 	}
-
 
 	const getBankTransactions = async (consentToken, sourceId) => {
 		setLoading(true);
@@ -90,15 +86,38 @@ export const Connections = () => {
 		if (success) {
 			alert('Transactions added successfully!');
 			setLoading(false);
-			window.location.reload();
 		} else {
 			alert('The action failed...');
 		}
 	}
 
+	const removeConnection = (id) => {
+		actions.deleteConnection(id);
+	}
+
+	const addSource = (event) => {
+		event.preventDefault();
+		const sourceData = {
+			name: name,
+			type_source: type,
+			amount: parseFloat(amount)
+		}
+		actions.createSource(sourceData);
+		const modal = document.getElementById("NewSourceModal");
+		if (modal) {
+			const bootstrapModal = window.bootstrap.Modal.getInstance(modal);
+			if (bootstrapModal) bootstrapModal.hide();
+		}
+		setName('');
+		setType('');
+		setAmount('');
+	}
+
+	const removeSource = (id) => {
+		actions.deleteSource(id);
+	}
 
 	if (loading) return <Spinner />
-
 
 	return (
 		<>
@@ -122,12 +141,15 @@ export const Connections = () => {
 							<div className="d-flex justify-content-center">
 								<form className="col-6 text-center" onSubmit={handleAuthorization}>
 									<select className="form-select" aria-label="Default select example" value={bank} onChange={(e) => setBank(e.target.value)}>
-										<option value="" disabled>Select your bank</option>
-										{Array.isArray(institutions) && Array.isArray(connections) ? (
-											institutions.filter((institution) =>
-												!connections.some(connection => connection.institution_id === institution.id)).map((institution) => (
-													<option key={`${institution.id}`} value={institution.yapily_id}>{institution.name}</option>
-												))
+										{Array.isArray(institutions) && Array.isArray(connections) && institutions.some(
+											institution => !connections.some(connection => connection.institution_id === institution.id)
+										) ? (
+											<>
+												<option value="" disabled>Select your bank</option>
+												{institutions.filter(institution => !connections.some(connection => connection.institution_id === institution.id)).map(institution => (
+													<option key={institution.id} value={institution.yapily_id}>{institution.name}</option>
+												))}
+											</>
 										) : (
 											<option value="" disabled>We don't have more banks currently.</option>
 										)}
@@ -136,6 +158,48 @@ export const Connections = () => {
 										Ask for authorization
 									</button>
 								</form>
+							</div>
+							<div className="mt-5">
+								<p className="text-muted text-center">
+									If you couldn't find your bank in our available institutions or you just need to do a manual entry, please add your source here.
+									<button type="button" className="btn connection-btn ms-2" data-bs-toggle="modal" data-bs-target="#NewSourceModal"><i className="fas fa-plus"></i></button>
+								</p>
+								<div className="modal fade" id="NewSourceModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div className="modal-dialog">
+										<div className="modal-content">
+											<div className="modal-header">
+												<h5 className="modal-title" id="exampleModalLabel">New Source</h5>
+												<button type="reset" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											<div className="modal-body">
+												<form onSubmit={addSource}>
+													<div className="form-outline mb-4">
+														<label className="form-label" htmlFor="registerName">Name</label>
+														<input type="text" id="name" name="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} />
+													</div>
+													<div className="form-outline mb-4">
+														<label className="form-label" htmlFor="registerType">Type of the Source</label>
+														<select className="form-select" aria-label="Default select example" value={type} onChange={(event) => setType(event.target.value)}>
+															<option value="" disabled>Choose the type of the source</option>
+															<option value="bank_account">Bank Account</option>
+															<option value="credit_card">Credit Card</option>
+															<option value="debit_card">Debit Card</option>
+															<option value="manual_entry">Manual Entry</option>
+															<option value="others">Other</option>
+														</select>
+													</div>
+													<div className="form-outline mb-4">
+														<label className="form-label" htmlFor="registerAmount">Amount</label>
+														<input type="text" id="amount" name="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} />
+													</div>
+													<div className="modal-footer">
+														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Add Source</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 							<div className="text-center mt-5">
 								<h5>Connected banks</h5>
@@ -156,21 +220,23 @@ export const Connections = () => {
 													<div id={`collapse${connection.id}`} className="accordion-collapse collapse" data-bs-parent="#accordionExample">
 														<div className="accordion-body">
 															{Array.isArray(sources) && sources.some((source) => source.connection_id == connection.id) ?
-																<table className="table table-hover">
-																	<tbody>
-																		{sources.filter((source) => source.connection_id === connection.id).map((source, index) => {
-																			const hasTransactions = Array.isArray(transactions) && transactions.some((transaction) => transaction.source_id === source.id)
-																			return (
-
-																				<tr key={index}>
-																					<th scope="row" align="left">{index + 1}</th>
-																					<td align="left">{source.name}</td>
-																					<td align="right"><strong>Balance:</strong> {source.amount} <button className="btn btn-sm transaction-btn ms-5" onClick={() => getBankTransactions(connection.consent_token, source.yapily_id)}>{hasTransactions ? 'Update Transactions' : 'Add Transactions'}</button></td>
-																				</tr>
-																			);
-																		})}
-																	</tbody>
-																</table>
+																<>
+																	<table className="table table-hover">
+																		<tbody>
+																			{sources.filter((source) => source.connection_id === connection.id).map((source, index) => {
+																				const hasTransactions = Array.isArray(transactions) && transactions.some((transaction) => transaction.source_id === source.id)
+																				return (
+																					<tr key={index}>
+																						<th scope="row" align="left">{index + 1}</th>
+																						<td align="left">{source.name}</td>
+																						<td align="right"><strong>Balance:</strong> {source.amount} <button className="btn btn-sm transaction-btn ms-5" onClick={() => getBankTransactions(connection.consent_token, source.yapily_id)}>{hasTransactions ? 'Update Transactions' : 'Add Transactions'}</button></td>
+																					</tr>
+																				);
+																			})}
+																		</tbody>
+																	</table>
+																	<button type="button" className="btn btn-sm btn-link text-danger justify-content-end" onClick={() => removeConnection(connection.id)}>Remove Connection</button>
+																</>
 																:
 																<button className="btn transaction-btn btn-sm" onClick={() => getBankAccounts(connection.consent_token)}>Add Accounts</button>
 															}
@@ -186,6 +252,42 @@ export const Connections = () => {
 									</div>
 								}
 							</div>
+							<div className="text-center mt-5">
+								<h5>Other sources</h5>
+								<div className="accordion" id="accordionExample2">
+									<div className="accordion-item">
+										<h2 className="accordion-header">
+											<button className="accordion-button connection-accordion" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+												Manual Entries
+											</button>
+										</h2>
+										<div id="collapseOne" className="accordion-collapse collapse" data-bs-parent="#accordionExample2">
+											<div className="accordion-body">
+												<table className="table table-hover">
+													<tbody>
+														{sources.filter((source) => !source.connection_id).map((source, index) => {
+															const typeSourceMap = {
+																bank_account: "Bank Account",
+																manual_entry: "Manual Entry",
+																credit_card: "Credit Card",
+																debit_card: "Debit Card",
+																others: "Other"
+															}
+															return (
+																<tr key={index}>
+																	<th scope="row" align="left">{index + 1}</th>
+																	<td align="left">{source.name} - {typeSourceMap[source.type_source]}</td>
+																	<td align="right"><strong>Balance:</strong> {source.amount} <button type="button" className="btn btn-sm btn-danger ms-5" onClick={() => removeSource(source.id)}>Remove</button></td>
+																</tr>
+															);
+														})}
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 						</>
 					)}
 				</div>
@@ -196,7 +298,7 @@ export const Connections = () => {
 						<p className="text-muted">
 							Please, confirm to save the bank.
 						</p>
-						<button id="boton-logout" className="btn fw-bold" onClick={bankConfirmation}>
+						<button className="btn connection-btn fw-bold" onClick={bankConfirmation}>
 							Confirm
 						</button>
 					</div>

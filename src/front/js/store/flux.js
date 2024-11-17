@@ -192,6 +192,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("These are the connections", data);
 				setStore({ connections: data.results });
 			},
+			deleteConnection: async (id) => {
+				const uri = `${getStore().host}/api/connections/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				};
+				getActions().getConnections();
+			},
 			createYapilyUser: async (id) => {
 				const uri = `${getStore().host}/api/create-yapily-user`;
 				const options = {
@@ -251,6 +267,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
+
 				return data;
 			},
 			getConsentToken: async (consentToken, institutionId) => {
@@ -286,6 +303,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
+				getActions().getSources();
 				return data;
 			},
 			getBankTransactions: async (consentToken, sourceId) => {
@@ -304,6 +322,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
+				getActions().getTransactions();
 				return data;
 			},
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
@@ -538,6 +557,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error en la conexión al backend:", error);
 				}
 			},
+			setCurrentSource: (Source) => { setStore({ Source: Source }) },
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("token");
@@ -560,6 +580,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ sources: data.results });
 				console.log("estas son los sources", getStore().sources)
 			},
+			createSource: async (sourceData) => {
+				const uri = `${getStore().host}/api/sources`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify(sourceData),
+				}
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', error.status, error.statusText);
+					return false
+				}
+				const data = await response.json();
+				console.log(data);
+				getActions().getSources();
+			},
+			editSource: async (id, dataToSend) => {
+				const uri = `${getStore().host}/api/sources/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`,
+					},
+					body: JSON.stringify(dataToSend),
+				};
+				const response = await fetch(uri, options);
+				if (!options.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				}
+				getActions().setCurrentSource({});
+				getActions().getSources();
+			},
+			deleteSource: async (id) => {
+				const uri = `${getStore().host}/api/sources/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				};
+				getActions().getSources();
+			},
 			getCategories: async () => {
 				const uri = `${getStore().host}/api/categories`;
 				const token = localStorage.getItem("token");
@@ -581,19 +656,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
-			},
-			deleteConection: async (id) => {
-				const uri = ``;
-				const options = {
-					method: 'DELETE',
-				};
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				};
-				getActions().getConnections();
-				setStore({ connections: data.results });
 			},
 			updateUser: async (id, userData) => {
 				try {
