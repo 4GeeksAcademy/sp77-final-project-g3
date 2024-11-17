@@ -22,15 +22,15 @@ export const Balance = () => {
 				{/* source select */}
 				<div className="row mb-4">
 					<div class="dropdown">
-						<button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						<button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
 							Source
 						</button>
-						<ul className="dropdown-menu">
+						<ul className="dropdown-menu bg-light">
 							{store.sources.length > 0 ? (
-								store.sources.map(() =>
-									(<li key={index}><a className="dropdown-item">{source.name}</a></li>)))
+								store.sources.map((source, index) =>
+									(<li key={index}><a className="dropdown-item" href="#">{source.name}</a></li>)))
 								:
-								(<li><a className="dropdown-item">add a source</a></li>)}
+								(<li><a className="dropdown-item" href="#">add a source</a></li>)}
 						</ul>
 					</div>
 				</div>

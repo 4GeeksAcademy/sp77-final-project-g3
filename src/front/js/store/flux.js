@@ -14,6 +14,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: localStorage.getItem('token') || '',
 			sources: [],
 			categories: [],
+			currentCategory: [],
 			currentTransaction: {},
 		},
 
@@ -453,6 +454,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				setStore({ categories: data.results });
 				console.log("estas son los categories", getStore().categories)
+			},
+			createCategory: async (transactionData) => {
+				const uri = `${getStore().host}/api/categories`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify(transactionData),
+				}
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', error.status, error.statusText);
+					return
+				}
+				const data = await response.json();
+				getActions().getCategories();
+			},
+			setCurrentCategory: (category) => { setStore({ currentCategory: category }) },
+			editCategory: async (id, dataToSend) => {
+				const uri = `${getStore().host}/api/categories/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`,
+					},
+					body: JSON.stringify(dataToSend),
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				}
+				getActions().setCurrentCategory({});
+				getActions().getCategories();
+			},
+			deleteCategory: async (id) => {
+				const uri = `${getStore().host}/api/categories/${id}`;
+				const token = localStorage.getItem("token");
+				const options = {
+					method: 'DELETE',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+					},
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error:', response.status, response.statusText);
+					return
+				};
+				getActions().getCategories();
 			},
 			deleteConection: async (id) => {
 				const uri = ``;

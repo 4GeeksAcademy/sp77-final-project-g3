@@ -338,8 +338,7 @@ def categories():
         return response_body, 200
     if request.method == 'POST':
         data = request.json
-        row = Categories(type_category = data.get('type_category'),
-                         name = data.get('name'),
+        row = Categories(name = data.get('name'),
                          description = data.get('description'),
                          user_id = data.get('user_id'))
         db.session.add(row)
@@ -365,7 +364,6 @@ def category(id):
         return response_body, 200
     if request.method == 'PUT':
         data = request.json
-        row.type_category = data.get('type_category')
         row.name = data.get('name')
         row.description = data.get('description')
         row.user_id = data.get('user_id')
