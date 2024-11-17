@@ -213,7 +213,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log(data);
 				return true;
 			},
-			getBankAuthorization: async (code) => {
+			deleteYapilyUser: async (yapilyId) => {
+				const uri = `${getStore().host}/api/remove-yapily-user`;
+				const options = {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json;charset=UTF-8',
+						'Authorization': `Bearer ${localStorage.getItem('token')}`,
+						'yapilyId': yapilyId
+					}
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					console.log('Error: ', response.status, response.statusText);
+					return false;
+				};
+				const data = await response.json();
+				return data;
+			},
+			getBankAuthorization: async (institutionId) => {
 				const uri = `${getStore().host}/api/account-auth-requests`;
 				const options = {
 					method: 'POST',
@@ -223,7 +241,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					body: JSON.stringify({
 						applicationUserId: getStore().user.yapily_username,
-						institutionId: code,
+						institutionId: institutionId,
 						callback: `${getStore().frontHost}/connections`
 					})
 				};
@@ -235,7 +253,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				return data;
 			},
-			getConsentToken: async (consent_token, institution_code) => {
+			getConsentToken: async (consentToken, institutionId) => {
 				const uri = `${getStore().host}/api/consent-token`;
 				const options = {
 					method: 'POST',
@@ -243,7 +261,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					},
-					body: JSON.stringify({ consentToken: consent_token, institutionCode: institution_code })
+					body: JSON.stringify({ consentToken: consentToken, institutionId: institutionId })
 				};
 				const response = await fetch(uri, options);
 				if (!response.ok) {
@@ -253,12 +271,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				return data;
 			},
-			getBankAccounts: async (consent_token) => {
+			getBankAccounts: async (consentToken) => {
 				const uri = `${getStore().host}/api/accounts`;
 				const options = {
 					method: 'GET',
 					headers: {
-						'consent': consent_token,
+						'consent': consentToken,
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					}
 				};
@@ -268,16 +286,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
-				console.log(data);
-				return true;
+				return data;
 			},
-			getBankTransactions: async (consent, code) => {
+			getBankTransactions: async (consentToken, sourceId) => {
 				const uri = `${getStore().host}/api/bank-transactions`;
 				const options = {
 					method: 'GET',
 					headers: {
-						'consent': consent,
-						'code': code,
+						'consent': consentToken,
+						'sourceId': sourceId,
 						'Authorization': `Bearer ${localStorage.getItem('token')}`
 					}
 				};
@@ -287,8 +304,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
-				console.log(data);
-				return true;
+				return data;
 			},
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {

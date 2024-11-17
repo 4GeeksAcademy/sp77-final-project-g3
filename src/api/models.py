@@ -14,6 +14,7 @@ class Users(db.Model):
     phone_number = db.Column(db.String(), unique=False, nullable=True)
     photo_url = db.Column(db.String(), unique=False, nullable=True)
     yapily_username = db.Column(db.String(), unique=True, nullable=True)
+    yapily_id = db.Column(db.String(), unique=True, nullable=True)
 
     def __repr__(self):
         return f'<User {self.id} - {self.email}>'
@@ -25,28 +26,29 @@ class Users(db.Model):
                 'last_name': self.last_name,
                 'phone_number': self.phone_number,
                 'photo_url': self.photo_url,
-                'yapily_username': self.yapily_username}
+                'yapily_username': self.yapily_username,
+                'yapily_id': self.yapily_id}
 
 
 class Institutions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    yapily_id = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(120), unique=True, nullable=False)
-    code = db.Column(db.String(80), unique=True, nullable=False)
     icon = db.Column(db.String(), unique=True, nullable=True)
 
     def __repr__(self):
-        return f'<Institution {self.name} - {self.code}>'
+        return f'<Institution {self.name} - {self.yapily_id}>'
     
     def serialize(self):
         return {'id': self.id,
+                'yapily_id': self.yapily_id,
                 'name': self.name,
-                'code': self.code,
                 'icon': self.icon}
 
 
 class Connections(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    consent_token = db.Column(db.String(600), unique=False, nullable=True)
+    consent_token = db.Column(db.String(600), unique=True, nullable=True)
     institution_id = db.Column(db.Integer, db.ForeignKey('institutions.id'))
     institution_to = db.relationship('Institutions', foreign_keys=[institution_id], backref=db.backref('connection_to', lazy='select'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -64,7 +66,7 @@ class Connections(db.Model):
 
 class Sources(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(50), unique=False, nullable=True)
+    yapily_id = db.Column(db.String(), unique=False, nullable=True)
     name = db.Column(db.String(120), unique=False, nullable=False)
     type_source = db.Column(db.Enum("bank_account", "manual_entry", "credit_card", "debit_card", "others", name="type_source"), nullable=False)
     amount = db.Column(db.Float(), unique=False, nullable=False, default=0)
@@ -74,11 +76,11 @@ class Sources(db.Model):
     connection_to = db.relationship('Connections', foreign_keys=[connection_id], backref=db.backref('source_to', lazy='select'))
 
     def __repr__(self):
-        return f'<Source {self.code} - {self.type_source}>'
+        return f'<Source {self.name} - {self.type_source}>'
 
     def serialize(self):
         return {'id': self.id,
-                'code': self.code,
+                'yapily_id': self.yapily_id,
                 'name': self.name,
                 'type_source': self.type_source,
                 'amount': self.amount,
@@ -126,7 +128,7 @@ class Categories(db.Model):
 
 class Transactions(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(50), unique=False, nullable=True)
+    yapily_id = db.Column(db.String(), unique=False, nullable=True)
     amount = db.Column(db.Float(), unique=False, nullable=False)
     name = db.Column(db.String(), unique=False, nullable=True)
     type = db.Column(db.Enum("income", "expense", name="type"), nullable=False)
@@ -142,7 +144,7 @@ class Transactions(db.Model):
 
     def serialize(self):
         return {'id': self.id,
-                'code': self.code,
+                'yapily_id': self.yapily_id,
                 'amount': self.amount,
                 'name': self.name,
                 'type': self.type,

@@ -61,8 +61,9 @@ export const Profile = () => {
     const handleDeleteClick = async () => {
         const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
         if (confirmed) {
+            const yapilyRemoval = await actions.deleteYapilyUser(store.user.yapily_id)
             const success = await actions.deleteUser(store.user.id);
-            if (success) {
+            if (yapilyRemoval && success) {
                 console.log("Usuario eliminado y redirigido.");
                 window.location.href = "/";  //
             } else {

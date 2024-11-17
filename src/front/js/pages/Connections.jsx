@@ -16,11 +16,10 @@ export const Connections = () => {
 	const [confirmingBank, setConfirmingBank] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-	const [yapilyUser, setYapilyUser] = useState(null);
-	const [accounts, setAccounts] = useState(null);
 
 
 	useEffect(() => {
+		actions.getConnections();
         const userId = store.user?.id || localStorage.getItem("user_id");
         if (userId) {
             actions.getUser(userId).finally(() => setLoading(false));
@@ -34,25 +33,16 @@ export const Connections = () => {
 	useEffect(() => {
 		const queryParams = new URLSearchParams(location.search);
 		const consentToken = queryParams.get('consent');
-		const institutionCode = queryParams.get('institution');
-		if (consentToken && institutionCode) {
+		const institutionId = queryParams.get('institution');
+		if (consentToken && institutionId) {
 			setConfirmingBank(true);
 		}
 	}, []);
 
 
 	const createYapilyUser = async () => {
-		setLoading(true);
-		setError(null);
-		try {
-			const id = store.user.id
-			const result = await actions.createYapilyUser(id);
-			setYapilyUser(result);
-		} catch (fail) {
-			setError(fail.message);
-		} finally {
-			window.location.reload();
-		}
+		await actions.createYapilyUser(store.user.id);
+		window.location.reload();
 	};
 
 
@@ -64,7 +54,6 @@ export const Connections = () => {
 		}
 		const response = await actions.getBankAuthorization(bank);
 		if (response && response.authorisationUrl) {
-			setLoading(true);
 			window.location.href = response.authorisationUrl;
 		} else {
 			alert("You couldn't get the authorization, please try again!");
@@ -74,31 +63,37 @@ export const Connections = () => {
 	const bankConfirmation = () => {
 		const queryParams = new URLSearchParams(location.search);
 		const consentToken = queryParams.get('consent');
-		const institutionCode = queryParams.get('institution');
-		actions.getConsentToken(consentToken, institutionCode);
+		const institutionId= queryParams.get('institution');
+		actions.getConsentToken(consentToken, institutionId);
 		setConfirmingBank(false);
 		navigate('/connections');
-		setLoading(true);
 		window.location.reload();
 	}
 
 
-	const getBankAccounts = async (consent) => {
+	const getBankAccounts = async (consentToken) => {
 		setLoading(true);
-		setError(null);
-		try {
-			const result = await actions.getBankAccounts(consent);
-			setAccounts(result);
-		} catch (fail) {
-			setError(fail.message);
-		} finally {
+		const success = await actions.getBankAccounts(consentToken);
+		if (success) {
+			alert('Accounts added successfully!');
 			setLoading(false);
+			window.location.reload();
+		} else {
+			alert('The action failed...');
 		}
 	}
 
 
-	const getBankTransactions = (consent, code) => {
-		actions.getBankTransactions(consent, code);
+	const getBankTransactions = async (consentToken, sourceId) => {
+		setLoading(true);
+		const success = await actions.getBankTransactions(consentToken, sourceId);
+		if (success) {
+			alert('Transactions added successfully!');
+			setLoading(false);
+			window.location.reload();
+		} else {
+			alert('The action failed...');
+		}
 	}
 
 
@@ -131,7 +126,7 @@ export const Connections = () => {
 										{Array.isArray(institutions) && Array.isArray(connections) ? (
 											institutions.filter((institution) =>
 												!connections.some(connection => connection.institution_id === institution.id)).map((institution) => (
-													<option key={`${institution.id}`} value={institution.code}>{institution.name}</option>
+													<option key={`${institution.id}`} value={institution.yapily_id}>{institution.name}</option>
 												))
 										) : (
 											<option value="" disabled>We don't have more banks currently.</option>
@@ -144,40 +139,40 @@ export const Connections = () => {
 							</div>
 							<div className="text-center mt-5">
 								<h5>Connected banks</h5>
-								{Array.isArray(connections) && connections.some((item) => item.consent_token) ?
+								{Array.isArray(connections) && connections.some((connection) => connection.consent_token) ?
 									<div className="accordion" id="accordionExample">
-										{connections.filter((item) => item.consent_token).map((item) => {
-											const institution = institutions.find((bank) => bank.id === item.institution_id)
+										{connections.filter((connection) => connection.consent_token).map((connection) => {
+											const institution = institutions.find((institution) => institution.id === connection.institution_id)
 											if (!institution) {
 												return null
 											}
 											return (
-												<div className="accordion-item" key={item.id}>
+												<div className="accordion-item" key={connection.id}>
 													<h2 className="accordion-header">
-														<button className="accordion-button connection-accordion" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${item.id}`} aria-expanded="true" aria-controls={`collapse${item.id}`}>
+														<button className="accordion-button connection-accordion" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse${connection.id}`} aria-expanded="true" aria-controls={`collapse${connection.id}`}>
 															<img src={institution.icon} width="25" className="me-3" /> {institution.name}
 														</button>
 													</h2>
-													<div id={`collapse${item.id}`} className="accordion-collapse collapse" data-bs-parent="#accordionExample">
+													<div id={`collapse${connection.id}`} className="accordion-collapse collapse" data-bs-parent="#accordionExample">
 														<div className="accordion-body">
-															{Array.isArray(sources) && sources.some((element) => element.connection_id == item.id) ?
+															{Array.isArray(sources) && sources.some((source) => source.connection_id == connection.id) ?
 																<table className="table table-hover">
 																	<tbody>
-																		{sources.filter((element) => element.connection_id === item.id).map((element, index) => {
-																			const hasTransactions = Array.isArray(transactions) && transactions.some((transaction) => transaction.source_id === element.id)
+																		{sources.filter((source) => source.connection_id === connection.id).map((source, index) => {
+																			const hasTransactions = Array.isArray(transactions) && transactions.some((transaction) => transaction.source_id === source.id)
 																			return (
 
 																				<tr key={index}>
 																					<th scope="row" align="left">{index + 1}</th>
-																					<td align="left">{element.name}</td>
-																					<td align="right"><strong>Balance:</strong> {element.amount} <button className="btn btn-sm transaction-btn ms-5" onClick={() => getBankTransactions(item.consent_token, element.code)}>{hasTransactions ? 'Update Transactions' : 'Add Transactions'}</button></td>
+																					<td align="left">{source.name}</td>
+																					<td align="right"><strong>Balance:</strong> {source.amount} <button className="btn btn-sm transaction-btn ms-5" onClick={() => getBankTransactions(connection.consent_token, source.yapily_id)}>{hasTransactions ? 'Update Transactions' : 'Add Transactions'}</button></td>
 																				</tr>
 																			);
 																		})}
 																	</tbody>
 																</table>
 																:
-																<button className="btn transaction-btn btn-sm" onClick={() => getBankAccounts(item.consent_token)}>Add Accounts</button>
+																<button className="btn transaction-btn btn-sm" onClick={() => getBankAccounts(connection.consent_token)}>Add Accounts</button>
 															}
 														</div>
 													</div>
