@@ -614,7 +614,7 @@ def budgets():
     response_body = {}
     current_user = get_jwt_identity()
     if request.method == 'GET':
-        rows = db.session.execute(db.select(Budgets).where(Categories.user_id == current_user['user_id'])).scalars()
+        rows = db.session.execute(db.select(Budgets).distinct().where(Categories.user_id == current_user['user_id'])).scalars()
         result = [row.serialize() for row in rows]
         response_body['message'] = "These are your budgets (GET)"
         response_body['results'] = result

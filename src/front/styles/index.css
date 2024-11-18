@@ -17,9 +17,8 @@
 }
 
 .bg-dark {
-    background-color: #2D3748;
+    background-color: #2D3748 !important;
     color: white;
-    ;
 }
 
 
@@ -84,5 +83,10 @@
 }
 
 .transaction-btn:hover {
+    color: white;
+}
+
+.btn-dark {
+    background-color: #2D3748 !important;
     color: white;
 }
