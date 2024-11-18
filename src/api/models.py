@@ -172,4 +172,5 @@ class Budgets(db.Model):
                 'budget_amount': self.budget_amount,
                 'target_period': self.target_period,
                 'total_expense': self.total_expense,
-                'category_id': self.category_id}
+                'category_id': self.category_id,
+                'category_name': self.category_to.name if self.category_to else None}
