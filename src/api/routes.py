@@ -4,7 +4,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 from flask import Flask, request, jsonify, url_for, Blueprint
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from api.models import db, Users, Institutions, Sources, Balances, Categories, Transactions, FixedExpenses, Budgets
+from api.models import db, Users, Institutions, Connections, Sources, Balances, Categories, Transactions, FixedExpenses, Budgets
 from datetime import datetime, timezone, timedelta
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import get_jwt_identity
@@ -24,7 +24,7 @@ CORS(api)  # Allow CORS requests to this API
 load_dotenv()
 
 
-yapily_id = os.getenv('YAPILY_ID')
+yapily_uuid = os.getenv('YAPILY_UUID')
 yapily_secret = os.getenv('YAPILY_SECRET')
 
 
@@ -104,17 +104,24 @@ def remove_account():
 def institutions():
     response_body = {}
     url = 'https://api.yapily.com/institutions'
-    response = requests.get(url, auth=(yapily_id, yapily_secret))
+    response = requests.get(url, auth=(yapily_uuid, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     institutions_list = response.json()
     data = institutions_list.get('data')
     for institution_data in data:
-        saved_institution = db.session.execute(db.select(Institutions).where(Institutions.code == institution_data.get('id'))).scalar_one_or_none()
+        saved_institution = db.session.execute(db.select(Institutions).where(Institutions.yapily_id == institution_data.get('id'))).scalar_one_or_none()
         if not saved_institution:
+            icon = None
+            for media_item in institution_data.get('media'):
+                if isinstance(media_item, dict) and media_item.get('type') == "icon":
+                    icon = media_item.get('source')
+                    break
             new_institution = Institutions(name=institution_data.get('name'),
-                                           code=institution_data.get('id'))
+                                           yapily_id=institution_data.get('id'),
+                                           icon=icon)
             db.session.add(new_institution)
     db.session.commit()
     rows = db.session.execute(db.select(Institutions)).scalars()
@@ -124,25 +131,93 @@ def institutions():
     return response_body, 200
 
 
-@api.route('/yapily-connection', methods=['POST'])
+@api.route('/connections', methods=['GET'])
 @jwt_required()
-def yapily_connection():
+def connections():
+    response_body = {}
+    current_user = get_jwt_identity()
+    rows = db.session.execute(db.select(Connections).where(Connections.user_id == current_user['user_id'])).scalars()
+    result = [row.serialize() for row in rows]
+    response_body['message'] = "These are your connections (GET)"
+    response_body['results'] = result
+    return response_body, 200
+
+
+@api.route('/connections/<int:id>', methods=['DELETE'])
+@jwt_required()
+def connection(id):
+    response_body = {}
+    current_user = get_jwt_identity()
+    row = db.session.execute(db.select(Connections).where(Connections.user_id == current_user['user_id'], Connections.id == id)).scalar()
+    db.session.execute(db.delete(Transactions).where(Transactions.source_id.in_(db.session.execute(db.select(Sources.id).where(Sources.connection_id == id)).scalars())))
+    db.session.execute(db.delete(Sources).where(Sources.connection_id == id))
+    db.session.delete(row)
+    db.session.commit()
+    response_body['message'] = "The connection was deleted (DELETE)"
+    response_body['results'] = {}
+    return response_body, 200
+
+
+@api.route('/create-yapily-user', methods=['POST'])
+@jwt_required()
+def create_yapily_user():
     response_body = {}
     current_user = get_jwt_identity()
     user = Users.query.filter_by(id=current_user['user_id']).first()
+    email_start = user.email.split('@')[0]
     url = "https://api.yapily.com/users"
+    payload = {
+        "applicationUserId": f"ExpenseVue{user.id}{email_start}"
+    }
     headers = {
         "Content-Type": "application/json;charset=UTF-8"
     }
-    response = requests.post(url, headers=headers, auth=(yapily_id, yapily_secret))
-    if response.status_code != 200:
+    response = requests.post(url, json=payload, headers=headers, auth=(yapily_uuid, yapily_secret))
+    if response.status_code != 201:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     data = response.json()
-    app_id = data.get('applicationUserId')
-    user.yapily_id = app_id
+    user.yapily_username = data.get('applicationUserId')
+    user.yapily_id = data.get('uuid')
     db.session.commit()
-    response_body['message'] = "The connection with Yapily was created!"
+    response_body['message'] = "User created in Yapily"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/yapily-users', methods=['GET'])
+def yapily_users():
+    response_body = {}
+    url = "https://api.yapily.com/users"
+    response = requests.get(url, auth=(yapily_uuid, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
+        return response_body, 400
+    data = response.json()
+    if not data:
+        response_body['message'] = "No users found in Yapily."
+        response_body['results'] = []
+        return response_body, 400
+    response_body['message'] = "These are all the current Yapily users within the app"
+    response_body['results'] = data
+    return response_body, 200
+
+
+@api.route('/remove-yapily-user', methods=['DELETE'])
+def remove_yapily_user():
+    response_body = {}
+    user_uuid = request.headers.get('yapilyId')
+    url = "https://api.yapily.com/users/" + user_uuid
+    response = requests.delete(url, auth=(yapily_uuid, yapily_secret))
+    if response.status_code != 200:
+        response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
+        return response_body, 400
+    data = response.json()
+    response_body['message'] = "Yapily user removed!"
+    response_body['results'] = data.get('data')
     return response_body, 200
 
 
@@ -152,13 +227,15 @@ def account_auth_requests():
     response_body = {}
     current_user = get_jwt_identity()
     user = Users.query.filter_by(id=current_user['user_id']).first()
-    institution_id = request.args.get('institution_id')
-    institution = Institutions.query.filter_by(id=institution_id).first()
+    front_data = request.get_json()
+    application_user_id = front_data.get('applicationUserId')
+    institution_id = front_data.get('institutionId')
+    callback = front_data.get('callback')
     url = 'https://api.yapily.com/account-auth-requests'
     payload = {
-        "applicationUserId": user.yapily_id,
-        "institutionId": institution.code,
-        "callback": "https://display-parameters.com/"
+        "applicationUserId": application_user_id,
+        "institutionId": institution_id,
+        "callback": callback
     }
     headers = {
         "Content-Type": "application/json;charset=UTF-8"
@@ -166,16 +243,36 @@ def account_auth_requests():
     query = {
         "raw": "true"
     }
-    response = requests.get(url, json=payload, headers=headers, params=query, auth=(yapily_id, yapily_secret))
-    if response.status_code != 200:
+    response = requests.post(url, json=payload, headers=headers, params=query, auth=(yapily_uuid, yapily_secret))
+    if response.status_code != 201:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     data = response.json()
-    consent = data.get('institutionConsentId')
-    institution.consent = consent
-    institution.user_id = user.id
+    authorisation_url = data.get('data').get('authorisationUrl')
+    institution = Institutions.query.filter_by(yapily_id=institution_id).first()
+    new_connection = Connections(user_id=user.id,
+                                 institution_id=institution.id)
+    db.session.add(new_connection)
     db.session.commit()
-    response_body['message'] = "You received the authorization for this institution!"
+    return {"authorisationUrl": authorisation_url}, 200
+
+
+@api.route('/consent-token', methods=['POST'])
+@jwt_required()
+def consent_token():
+    response_body = {}
+    current_user = get_jwt_identity()
+    user = Users.query.filter_by(id=current_user['user_id']).first()
+    front_data = request.get_json()
+    consent_token = front_data.get('consentToken')
+    institution_id = front_data.get('institutionId')
+    institution = Institutions.query.filter_by(yapily_id=institution_id).first()
+    connection = Connections.query.filter_by(institution_id=institution.id, user_id=user.id).first()
+    connection.consent_token = consent_token
+    db.session.commit()
+    response_body['message'] = f"The consent token for the institution {institution.name} was saved"
+    response_body['results'] = consent_token
     return response_body, 200
 
 
@@ -184,72 +281,81 @@ def account_auth_requests():
 def accounts():
     response_body = {}
     current_user = get_jwt_identity()
-    institution_id = request.args.get('institution_id')
-    institution = Institutions.query.filter_by(id=institution_id, user_id=current_user.get('user_id')).first()
+    user = Users.query.filter_by(id=current_user['user_id']).first()
+    consent_token = request.headers.get('consent')
+    connection = Connections.query.filter_by(consent_token=consent_token).first()
     url = 'https://api.yapily.com/accounts'
     headers = {
-        "consent": institution.consent
+        "consent": consent_token
     }
     query = {
         "raw": "true"
     }
-    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_uuid, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     accounts_list = response.json()
     data = accounts_list.get('data')
     for account_data in data:
-        saved_source = db.session.execute(db.select(Sources).where(Sources.id == account_data.get('id'))).scalar_one_or_none()
+        saved_source = db.session.execute(db.select(Sources).where((Sources.yapily_id == account_data.get('id')) & (Sources.user_id == user.id))).scalar_one_or_none()
         if not saved_source:
-            new_source = Sources(id=account_data.get('id'),
-                                 name=institution.name,
-                                 type_source='bank account',
+            new_source = Sources(name=account_data.get('type'),
+                                 yapily_id=account_data.get('id'),
+                                 type_source='bank_account',
                                  amount=account_data.get('balance'),
-                                 user_id=current_user.get('user_id'))
+                                 user_id=user.id,
+                                 connection_id=connection.id)
             db.session.add(new_source)
     db.session.commit()
     rows = db.session.execute(db.select(Sources)).scalars()
     result = [row.serialize() for row in rows]
-    response_body['message'] = f"Your accounts in {institution.name} were added to your sources successfully!"
+    response_body['message'] = f"Your accounts were added to your sources successfully!"
     response_body['results'] = result
     return response_body, 200
 
 
-@api.route('/yapily-transactions', methods=['GET'])
+@api.route('/bank-transactions', methods=['GET'])
 @jwt_required()
-def yapily_transactions():
+def bank_transactions():
     response_body = {}
     current_user = get_jwt_identity()
-    account_id = request.args.get('source_id')
-    source = Sources.query.filter_by(id=account_id).first()
-    institution = Institutions.query.filter_by(name=source.name, user_id=current_user.get('user_id')).first()
-    url = f'https://api.yapily.com/accounts/{account_id}/transactions'
+    user = Users.query.filter_by(id=current_user['user_id']).first()
+    consent_token = request.headers.get('consent')
+    source_id = request.headers.get('sourceId')
+    connection = Connections.query.filter_by(consent_token=consent_token, user_id=user.id).first()
+    source = Sources.query.filter_by(yapily_id=source_id, user_id=user.id).first()
+    url = f'https://api.yapily.com/accounts/' + source_id + '/transactions'
     headers = {
-        "consent": institution.consent
+        "consent": consent_token
     }
     query = {
         "raw": "true"
     }
-    response = requests.get(url, headers=headers, params=query, auth=(yapily_id, yapily_secret))
+    response = requests.get(url, headers=headers, params=query, auth=(yapily_uuid, yapily_secret))
     if response.status_code != 200:
         response_body['message'] = "Something went wrong"
+        response_body['results'] = response.json()
         return response_body, 400
     transactions_list = response.json()
     data = transactions_list.get('data')
     for transaction_data in data:
-        saved_transaction = db.session.execute(db.select(Transactions).where(Transactions.id == transaction_data.get('id'))).scalar_one_or_none()
+        saved_transaction = db.session.execute(db.select(Transactions).where((Transactions.yapily_id == transaction_data.get('id')) & (Transactions.source_id == source.id))).scalar_one_or_none()
         if not saved_transaction:
-            new_transaction = Transactions(id=transaction_data.get('id'),
-                                           amount=transaction_data.get('amount'),
+            amount = transaction_data.get('amount')
+            transaction_type = 'expense' if amount < 0 else 'income'
+            new_transaction = Transactions(yapily_id=transaction_data.get('id'),
+                                           amount=amount,
+                                           type=transaction_type,
                                            description=transaction_data.get('description'),
                                            date=transaction_data.get('date'),
-                                           source_id=account_id)
+                                           source_id=source.id)
             db.session.add(new_transaction)
     db.session.commit()
     rows = db.session.execute(db.select(Transactions)).scalars()
     result = [row.serialize() for row in rows]
-    response_body['message'] = f"The transactions from the account {account_id} were added successfully!"
+    response_body['message'] = f"The transactions from the account {source.yapily_id} were added successfully!"
     response_body['results'] = result
     return response_body, 200
 
@@ -270,7 +376,7 @@ def sources():
         row = Sources(name = data.get('name'),
                       type_source = data.get('type_source'),
                       amount = data.get('amount'),
-                      user_id = data.get('user_id'))
+                      user_id = current_user['user_id'])
         db.session.add(row)
         db.session.commit()
         response_body['message'] = "You have a new source (POST)"

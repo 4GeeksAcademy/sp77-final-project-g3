@@ -65,6 +65,27 @@
     filter: brightness(0) invert(1);
 }
 
+.connection-accordion {
+    background-color: #2D3748;
+}
+
+.connection-btn {
+    background-color: #2D3748;
+    color: white;
+}
+
+.connection-btn:hover {
+    color: #ffc107;
+}
+
+.transaction-btn {
+    background-color: #ffc107;
+}
+
+.transaction-btn:hover {
+    color: white;
+}
+
 .btn-dark {
     background-color: #2D3748 !important;
     color: white;
