@@ -17,9 +17,8 @@
 }
 
 .bg-dark {
-    background-color: #2D3748;
+    background-color: #2D3748 !important;
     color: white;
-    ;
 }
 
 
@@ -64,4 +63,9 @@
 
 .accordion-button:not(.collapsed)::after {
     filter: brightness(0) invert(1);
+}
+
+.btn-dark {
+    background-color: #2D3748 !important;
+    color: white;
 }

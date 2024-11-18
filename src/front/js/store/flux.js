@@ -38,7 +38,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				localStorage.setItem('user', JSON.stringify(data.results));
 				setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
 				return true;
-			},			
+			},
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
@@ -137,25 +137,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			deleteUser: async (id) => {
 				try {
-					const store = getStore(); 
+					const store = getStore();
 					const uri = `${process.env.BACKEND_URL}/api/users/${id}`;
 					console.log("URL de eliminación:", uri);
-			
+
 					const options = {
 						method: 'DELETE',
 						headers: {
-							'Authorization': `Bearer ${localStorage.getItem('token')}`, 
+							'Authorization': `Bearer ${localStorage.getItem('token')}`,
 							'Content-Type': 'application/json',
 						},
 					};
-			
+
 					const response = await fetch(uri, options);
-					
+
 					if (!response.ok) {
 						console.log('Error en la respuesta:', response.status, response.statusText);
 						return false;
 					}
-					
+
 					console.log('Usuario eliminado exitosamente');
 					getActions().logout();
 					return true;
@@ -163,7 +163,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log('Error de red:', error);
 					return false;
 				}
-			},					
+			},
 			setCurrentTransaction: (transaction) => { setStore({ currentTransaction: transaction }) },
 			getTransactions: async () => {
 				const uri = `${getStore().host}/api/transactions`;
@@ -271,50 +271,74 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ budgets: data.results });
 				console.log("estas son los budgets", getStore().budgets)
 			},
-			createBudget: async (loginData) => {
-				const uri = ``;
-				const options = {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(loginData),
+			createBudget: async (budgetData) => {
+				const token = localStorage.getItem("token"); 
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/budgets`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify(budgetData),
+					});
+			
+					if (!response.ok) {
+						throw new Error(`${response.status} ${response.statusText}`);
+					}
+			
+					const data = await response.json();
+					console.log("Budget created successfully:", data);
+					return data;
+				} catch (error) {
+					console.error("Error creating budget:", error);
 				}
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', error.status, error.statusText);
-					return
-				}
-
-				getActions().getBudgets();
-			},
+			},								
 			editBudget: async (id, dataToSend) => {
-				const uri = ``;
+				const token = localStorage.getItem('token'); 
+				const uri = `${process.env.BACKEND_URL}/api/budgets/${id}`;
 				const options = {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
+						Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
 					},
 					body: JSON.stringify(dataToSend),
 				};
-				const response = await fetch(uri, options);
-				if (!options.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
+				try {
+					const response = await fetch(uri, options);
+					if (!response.ok) {
+						console.error('Error:', response.status, response.statusText);
+						throw new Error(`${response.status} ${response.statusText}`);
+					}
+					const result = await response.json();
+					console.log('Budget updated:', result);
+					getActions().getBudgets();
+				} catch (error) {
+					console.error('Edit budget failed:', error);
 				}
-				getActions().setCurrentBudget({});
-				getActions().getBudgets();
-			},
+			},					
 			deleteBudgets: async (id) => {
-				const uri = ``;
+				const token = localStorage.getItem("token");
+				const uri = `${process.env.BACKEND_URL}/api/budgets/${id}`;
 				const options = {
-					method: 'DELETE',
+					method: "DELETE",
+					headers: {
+						"Authorization": `Bearer ${token}`, 
+					},
 				};
-				const response = await fetch(uri, options);
-				if (!response.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				};
-				getActions().getBudget();
-			},
+			
+				try {
+					const response = await fetch(uri, options);
+					if (!response.ok) {
+						console.error("Error deleting budget:", response.status, response.statusText);
+						return;
+					}
+					getActions().getBudgets();
+				} catch (error) {
+					console.error("Error during deleteBudgets:", error);
+				}
+			},			
 			getFixedExpenses: async () => {
 				const uri = `${getStore().host}/api/fixed-expenses`;
 				const token = localStorage.getItem("token");
@@ -496,21 +520,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			passwordRecovery: async (email) => {
 				const uri = `${process.env.BACKEND_URL}/api/forgot-password`;
-			
+
 				const response = await fetch(uri, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ email })
 				});
-			
+
 				const data = await response.json();
-			
+
 				if (response.ok) {
 					setStore({ message: "You will receive password reset instructions." });
 				} else {
 					throw new Error(data.message || 'An error occurred, please try again later.');
 				}
-			},			
+			},
 			resetPassword: async (token, newPassword) => {
 				const uri = `${process.env.BACKEND_URL}/api/reset-password`; // Construimos la URL completa
 
@@ -530,24 +554,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ message: data.message || "Password reset successful." });
 			},
 			signup: async (dataToSend) => {
-                const uri = `${process.env.BACKEND_URL}/api/signup`;
-                const options = {
-                    method: 'POST',
-                    headers: { "Content-Type": 'application/json' },
-                    body: JSON.stringify(dataToSend)
-                };
-                const response = await fetch(uri, options);
-                if (!response.ok) {
-                    const error = await response.json();
-                    setStore({ message: error.message || "Error in signup process" });
-                    return false;
-                }
-                const data = await response.json();
-                localStorage.setItem('token', data.access_token);
-                localStorage.setItem('user', JSON.stringify(data.results));
-                setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
-                return true;
-            }
+				const uri = `${process.env.BACKEND_URL}/api/signup`;
+				const options = {
+					method: 'POST',
+					headers: { "Content-Type": 'application/json' },
+					body: JSON.stringify(dataToSend)
+				};
+				const response = await fetch(uri, options);
+				if (!response.ok) {
+					const error = await response.json();
+					setStore({ message: error.message || "Error in signup process" });
+					return false;
+				}
+				const data = await response.json();
+				localStorage.setItem('token', data.access_token);
+				localStorage.setItem('user', JSON.stringify(data.results));
+				setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
+				return true;
+			}
 		}
 	}
 };
