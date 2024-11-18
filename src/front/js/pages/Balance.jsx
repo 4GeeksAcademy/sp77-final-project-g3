@@ -5,12 +5,18 @@ import { Context } from "../store/appContext.js";
 
 export const Balance = () => {
 	const { store, actions } = useContext(Context);
-	const formatBalanceNumber = (number) => { return new Intl.NumberFormat('es-ES', { style: 'decimal' }).format(number); }
+	const [currentBalance, setCurrentBalance] = useState(store.balance);
+	
 
+	const formatBalanceNumber = (number) => { return new Intl.NumberFormat('es-ES', { style: 'decimal' }).format(number); }
+	const handleSourceClick = (source) => {setCurrentBalance(source.amount)}
+	
 
 	useEffect(() => {
 		actions.getBalance();
 		actions.getSources();
+		console.log("fetch sources returns:", actions.getSources)
+		console.log("state of the sources store:", store.sources);
 	}, [])
 
 
@@ -21,14 +27,14 @@ export const Balance = () => {
 				<div className="row mb-2"><h2>Balance</h2></div>
 				{/* source select */}
 				<div className="row mb-4">
-					<div class="dropdown">
+					<div className="dropdown">
 						<button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
 							Source
 						</button>
 						<ul className="dropdown-menu bg-light">
 							{store.sources.length > 0 ? (
 								store.sources.map((source, index) =>
-									(<li key={index}><a className="dropdown-item" href="#">{source.name}</a></li>)))
+									(<li key={index}><a className="dropdown-item" href="#" onClick={() => handleSourceClick(source)}> {source.name} </a></li>)))
 								:
 								(<li><a className="dropdown-item" href="#">add a source</a></li>)}
 						</ul>
