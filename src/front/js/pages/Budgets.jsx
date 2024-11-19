@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext.js";
+import { Link } from "react-router-dom";
 import "../../styles/budgets.css";
 
 export const Budgets = () => {
@@ -13,11 +14,6 @@ export const Budgets = () => {
     const [targetPeriodOrder, setTargetPeriodOrder] = useState("");
     const [expenseOrder, setExpenseOrder] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [editingBudget, setEditingBudget] = useState(null);
-    const [editAmount, setEditAmount] = useState("");
-    const [editTargetPeriod, setEditTargetPeriod] = useState("");
-    const [editCategory, setEditCategory] = useState("");
-    const [editTotalExpense, setEditTotalExpense] = useState("");
 
     const uniqueBudgets = Array.from(new Map(store.budgets.map(b => [b.id, b])).values());
 
@@ -80,35 +76,6 @@ export const Budgets = () => {
         });
     };
 
-    const handleEditSubmit = (event, id) => {
-        event.preventDefault();
-        const updatedData = {
-            budget_amount: editAmount,
-            target_period: editTargetPeriod,
-            category_id: editCategory,
-            total_expense: editTotalExpense, 
-        };
-        actions.editBudget(id, updatedData).then(() => {
-            actions.getBudgets(); 
-            setEditAmount("");
-            setEditTargetPeriod("");
-            setEditCategory("");
-            setEditTotalExpense("");
-            setEditingBudget(null); 
-        });
-    };
-
-    const handleEditClick = (budget) => {
-        setEditingBudget(budget);
-        setEditAmount(budget.budget_amount);
-
-        const formattedDate = new Date(budget.target_period).toISOString().split("T")[0];
-        setEditTargetPeriod(formattedDate);
-
-        setEditCategory(budget.category_id);
-        setEditTotalExpense(budget.total_expense);
-    };
-
     const handleDelete = (id) => {
         if (window.confirm("Are you sure you want to delete this budget?")) {
             actions.deleteBudgets(id).then(() => {
@@ -116,7 +83,7 @@ export const Budgets = () => {
             });
         }
     };
-    
+
     return (
         <div className="budgets-container">
             <header className="budgets-header text-center py-4">
@@ -311,14 +278,12 @@ export const Budgets = () => {
                                         <strong>Total Expense:</strong> €{budget.total_expense || 0}
                                     </p>
                                     <div className="text-end">
-                                        <button
+                                        <Link
+                                            to={`/edit-budget/${budget.id}`}
                                             className="btn btn-warning btn-sm"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#EditBudgetModal"
-                                            onClick={() => handleEditClick(budget)}
                                         >
                                             <i className="fa-solid fa-pencil"></i>
-                                        </button>
+                                        </Link>
                                         <button
                                             className="btn btn-dark btn-sm ms-2"
                                             onClick={() => handleDelete(budget.id)}
@@ -330,72 +295,6 @@ export const Budgets = () => {
                             </div>
                         ))
                     )}
-                </div>
-            </div>
-            <div className="modal fade" id="EditBudgetModal" tabIndex="-1" aria-hidden="true">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">Edit Budget</h5>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div className="modal-body">
-                            <form onSubmit={(event) => handleEditSubmit(event, editingBudget.id)}>
-                                <div className="mb-3">
-                                    <label htmlFor="budgetAmount" className="form-label">Budget Amount (€)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="budgetAmount"
-                                        value={editAmount}
-                                        onChange={(e) => setEditAmount(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="targetPeriod" className="form-label">Target Period</label>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        id="targetPeriod"
-                                        value={editTargetPeriod}
-                                        onChange={(e) => setEditTargetPeriod(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="category" className="form-label">Category</label>
-                                    <select
-                                        id="category"
-                                        className="form-select"
-                                        value={editCategory}
-                                        onChange={(e) => setEditCategory(e.target.value)}
-                                        required
-                                    >
-                                        <option value="">Select a category</option>
-                                        {store.categories?.map((cat) => (
-                                            <option key={cat.id} value={cat.id}>
-                                                {cat.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="mb-3">
-                                    <label htmlFor="totalExpense" className="form-label">Total Expense (€)</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="totalExpense"
-                                        value={editTotalExpense}
-                                        onChange={(e) => setEditTotalExpense(e.target.value)}
-                                    />
-                                </div>
-                                <div className="text-end">
-                                    <button type="submit" className="btn btn-dark" data-bs-dismiss="modal">Save Changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div className="text-center py-4">
