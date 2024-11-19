@@ -1,0 +1,26 @@
+.budgets-container {
+    padding: 20px;
+}
+
+.budgets-header h2 {
+    font-weight: bold;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.modal-header, .modal-footer {
+    border: none;
+}
+
+.text-success {
+    color: #ffc107 !important;
+    font-weight: bold;
+}
+
+.card-header {
+    background-color: #2D3748;
+    color: #E2E8F0;
+}
+
