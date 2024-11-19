@@ -26,6 +26,7 @@ import { Error404 } from "./pages/Error404.jsx";
 import { ProtectedRoute } from "./pages/ProtectedRoute.jsx";
 import { PasswordRecovery } from "./pages/PasswordRecovery.jsx";
 import { ResetPassword } from "./pages/ResetPassword.jsx";
+import { EditBudget } from "./pages/EditBudget.jsx";
 import { AuthProvider } from "../../contexts/authContext/index.jsx";
 
 
@@ -77,6 +78,7 @@ const Layout = () => {
                             <Route path="/edit-transaction" element={<ProtectedRoute><EditTransaction /></ProtectedRoute>} />
                             <Route path="/edit-category" element={<ProtectedRoute><EditCategory /></ProtectedRoute>} />
                             <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
+                            <Route path="/edit-budget/:id" element={<ProtectedRoute><EditBudget /></ProtectedRoute>} />
                         </Route>
 
                         {/* Ruta para Not Found */}
