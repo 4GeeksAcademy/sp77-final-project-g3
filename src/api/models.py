@@ -29,7 +29,9 @@ class Users(db.Model):
                 'phone_number': self.phone_number,
                 'photo_url': self.photo_url,
                 'yapily_username': self.yapily_username,
-                'yapily_id': self.yapily_id}
+                'yapily_id': self.yapily_id,
+                'reset_token': self.reset_token,
+                'token_expiration': self.token_expiration}
 
 
 class Institutions(db.Model):

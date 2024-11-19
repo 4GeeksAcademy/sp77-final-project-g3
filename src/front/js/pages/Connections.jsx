@@ -22,6 +22,7 @@ export const Connections = () => {
 
 	useEffect(() => {
 		actions.getConnections();
+		actions.getSources();
 		const userId = store.user?.id || localStorage.getItem("user_id");
 		if (userId) {
 			actions.getUser(userId).finally(() => setLoading(false));
@@ -113,6 +114,17 @@ export const Connections = () => {
 		setAmount('');
 	}
 
+	const editSource = (item) => {
+		const editedItem = {
+			id: item.id,
+			name: item.name,
+			type_source: item.type_source,
+			amount: parseFloat(item.amount)
+		}
+		actions.setCurrentSource(editedItem);
+		navigate('/edit-source');
+	}
+
 	const removeSource = (id) => {
 		actions.deleteSource(id);
 	}
@@ -175,7 +187,7 @@ export const Connections = () => {
 												<form onSubmit={addSource}>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerName">Name</label>
-														<input type="text" id="name" name="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} />
+														<input type="text" id="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} />
 													</div>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerType">Type of the Source</label>
@@ -190,7 +202,7 @@ export const Connections = () => {
 													</div>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerAmount">Amount</label>
-														<input type="text" id="amount" name="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} />
+														<input type="text" id="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} />
 													</div>
 													<div className="modal-footer">
 														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Add Source</button>
@@ -218,7 +230,7 @@ export const Connections = () => {
 														</button>
 													</h2>
 													<div id={`collapse${connection.id}`} className="accordion-collapse collapse" data-bs-parent="#accordionExample">
-														<div className="accordion-body">
+														<div className="accordion-body" style={{ overflow: 'auto' }}>
 															{Array.isArray(sources) && sources.some((source) => source.connection_id == connection.id) ?
 																<>
 																	<table className="table table-hover">
@@ -252,42 +264,52 @@ export const Connections = () => {
 									</div>
 								}
 							</div>
+							{Array.isArray(sources) && sources.some((manualSource) => !manualSource.yapily_id) ?
 							<div className="text-center mt-5">
 								<h5>Other sources</h5>
-								<div className="accordion" id="accordionExample2">
-									<div className="accordion-item">
-										<h2 className="accordion-header">
-											<button className="accordion-button connection-accordion" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-												Manual Entries
-											</button>
-										</h2>
-										<div id="collapseOne" className="accordion-collapse collapse" data-bs-parent="#accordionExample2">
-											<div className="accordion-body">
-												<table className="table table-hover">
-													<tbody>
-														{sources.filter((source) => !source.connection_id).map((source, index) => {
-															const typeSourceMap = {
-																bank_account: "Bank Account",
-																manual_entry: "Manual Entry",
-																credit_card: "Credit Card",
-																debit_card: "Debit Card",
-																others: "Other"
-															}
-															return (
-																<tr key={index}>
-																	<th scope="row" align="left">{index + 1}</th>
-																	<td align="left">{source.name} - {typeSourceMap[source.type_source]}</td>
-																	<td align="right"><strong>Balance:</strong> {source.amount} <button type="button" className="btn btn-sm btn-danger ms-5" onClick={() => removeSource(source.id)}>Remove</button></td>
-																</tr>
-															);
-														})}
-													</tbody>
-												</table>
+									<div className="accordion" id="accordionExample2">
+										<div className="accordion-item">
+											<h2 className="accordion-header">
+												<button className="accordion-button connection-accordion" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+													Manual Entries
+												</button>
+											</h2>
+											<div id="collapseOne" className="accordion-collapse collapse" data-bs-parent="#accordionExample2">
+												<div className="accordion-body" style={{ overflow: 'auto' }}>
+													<table className="table table-hover">
+														<tbody>
+															{sources.filter((source) => !source.connection_id).map((source, index) => {
+																const typeSourceMap = {
+																	bank_account: "Bank Account",
+																	manual_entry: "Manual Entry",
+																	credit_card: "Credit Card",
+																	debit_card: "Debit Card",
+																	others: "Other"
+																}
+																return (
+																	<tr key={index}>
+																		<th scope="row" align="left">{index + 1}</th>
+																		<td align="left">{source.name} - {typeSourceMap[source.type_source]}</td>
+																		<td align="right"><strong>Balance:</strong> {source.amount}</td>
+																		<td align="right">
+																			<button type="button" className="btn btn-warning btn-sm" onClick={() => editSource(source)}> <i className="fa-solid fa-pencil"></i> </button>
+																		</td>
+																		<td align="right">
+																			<button type="button" className="btn btn-dark btn-sm" onClick={() => removeSource(source.id)}> <i className="fa-solid fa-trash"></i> </button>
+																		</td>
+																	</tr>
+																);
+															})}
+														</tbody>
+													</table>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
 							</div>
+							:
+							''
+						}
 						</>
 					)}
 				</div>

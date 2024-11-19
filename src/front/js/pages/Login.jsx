@@ -6,6 +6,7 @@ export const Login = () => {
     const { actions, store } = useContext(Context);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [visible, setVisible] = useState(false);
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [registerRepeatPassword, setRegisterRepeatPassword] = useState('');
@@ -62,26 +63,16 @@ export const Login = () => {
                 <div className="tab-content">
                     <div className="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="tab-login">
                         <form onSubmit={handleSubmitLogin}>
-                            <div className="text-center mb-3">
-                                <p>Sign in with:</p>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-facebook-f" style={{ color: '#2D3748' }}></i>
-                                </button>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-google" style={{ color: '#2D3748' }}></i>
-                                </button>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-github" style={{ color: '#2D3748' }}></i>
-                                </button>
-                            </div>
-                            <p className="text-center">or:</p>
                             <div className="form-outline mb-4">
                                 <input type="email" id="loginName" required aria-label="Email" value={email} onChange={handleEmail} className="form-control" />
                                 <label className="form-label" htmlFor="loginName">Email</label>
                             </div>
                             <div className="form-outline mb-2">
-                                <input type="password" id="loginPassword" required value={password} onChange={handlePassword} className="form-control" />
+                                <input type={visible ? 'text' : 'password'} id="loginPassword" required value={password} onChange={handlePassword} className="form-control" />
                                 <label className="form-label" htmlFor="loginPassword">Password</label>
+                                <div style={{ position: 'relative', left: '88%', transform: 'translateY(-265%)', cursor: 'pointer' }} onClick={() => setVisible(!visible)}>
+                                   {visible ? <i className="fas fa-eye-slash"></i> : <i className="fas fa-eye"></i>}
+                               </div>
                                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                             </div>
                             <div className="row mb-3">
@@ -96,19 +87,6 @@ export const Login = () => {
                     </div>
                     <div className="tab-pane fade" id="pills-register" role="tabpanel" aria-labelledby="tab-register">
                         <form onSubmit={handleSubmitRegister}>
-                            <div className="text-center mb-3">
-                                <p>Sign up with:</p>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-facebook-f" style={{ color: '#2D3748' }}></i>
-                                </button>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-google" style={{ color: '#2D3748' }}></i>
-                                </button>
-                                <button type="button" className="btn btn-link btn-floating mx-1">
-                                    <i className="fab fa-github" style={{ color: '#2D3748' }}></i>
-                                </button>
-                            </div>
-                            <p className="text-center">or:</p>
                             <div className="form-outline mb-4">
                                 <input type="email" id="registerEmail" value={registerEmail} onChange={handleRegisterEmail} className="form-control" required />
                                 <label className="form-label" htmlFor="registerEmail">Email</label>

@@ -18,6 +18,7 @@ import { Balance } from "./pages/Balance.jsx";
 import { Connections } from "./pages/Connections.jsx";
 import { Contact } from "./pages/Contact.jsx";
 import { Profile } from "./pages/Profile.jsx";
+import { EditSource } from "./pages/EditSource.jsx";
 import { EditTransaction } from "./pages/EditTransaction.jsx";
 import { EditCategory } from "./pages/EditCategory.jsx";
 import { Categories } from "./pages/Categories.jsx";
@@ -72,6 +73,7 @@ const Layout = () => {
                             <Route path="/balance" element={<ProtectedRoute><Balance /></ProtectedRoute>} />
                             <Route path="/connections" element={<ProtectedRoute><Connections /></ProtectedRoute>} />
                             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                            <Route path="/edit-source" element={<ProtectedRoute><EditSource /></ProtectedRoute>} />
                             <Route path="/edit-transaction" element={<ProtectedRoute><EditTransaction /></ProtectedRoute>} />
                             <Route path="/edit-category" element={<ProtectedRoute><EditCategory /></ProtectedRoute>} />
                             <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
