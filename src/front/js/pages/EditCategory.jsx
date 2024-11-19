@@ -34,7 +34,7 @@ export const EditCategory = () => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="form-outline mb-4">
-                <label className="form-label" htmlFor="registerName">Name</label>
+                <label className="form-label" htmlFor="registerName">Name<span className="required">*</span></label>
                 <input
                     type="text"
                     id="name"
@@ -42,6 +42,7 @@ export const EditCategory = () => {
                     className="form-control"
                     value={name}
                     onChange={(event) => setName(event.target.value)}
+                    required
                 />
             </div>
             <div className="form-outline mb-4">

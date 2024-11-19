@@ -186,12 +186,12 @@ export const Connections = () => {
 											<div className="modal-body">
 												<form onSubmit={addSource}>
 													<div className="form-outline mb-4">
-														<label className="form-label" htmlFor="registerName">Name</label>
-														<input type="text" id="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} />
+														<label className="form-label" htmlFor="registerName">Name<span className="required">*</span></label>
+														<input type="text" id="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} required/>
 													</div>
 													<div className="form-outline mb-4">
-														<label className="form-label" htmlFor="registerType">Type of the Source</label>
-														<select className="form-select" aria-label="Default select example" value={type} onChange={(event) => setType(event.target.value)}>
+														<label className="form-label" htmlFor="registerType">Type of the Source<span className="required">*</span></label>
+														<select className="form-select" aria-label="Default select example" value={type} onChange={(event) => setType(event.target.value)}required>
 															<option value="" disabled>Choose the type of the source</option>
 															<option value="bank_account">Bank Account</option>
 															<option value="credit_card">Credit Card</option>
@@ -201,8 +201,8 @@ export const Connections = () => {
 														</select>
 													</div>
 													<div className="form-outline mb-4">
-														<label className="form-label" htmlFor="registerAmount">Amount</label>
-														<input type="text" id="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} />
+														<label className="form-label" htmlFor="registerAmount">Amount<span className="required">*</span></label>
+														<input type="text" id="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} required/>
 													</div>
 													<div className="modal-footer">
 														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Add Source</button>
