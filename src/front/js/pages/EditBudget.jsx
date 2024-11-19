@@ -39,7 +39,7 @@ export const EditBudget = () => {
             <h2>Edit Budget</h2>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label htmlFor="amount" className="form-label">Budget Amount (€)</label>
+                    <label htmlFor="amount" className="form-label" required>Budget Amount (€) <span className="required">*</span></label>
                     <input
                         type="number"
                         id="amount"
@@ -50,7 +50,7 @@ export const EditBudget = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="targetPeriod" className="form-label">Target Period</label>
+                    <label htmlFor="targetPeriod" className="form-label" required>Target Period <span className="required">*</span></label>
                     <input
                         type="date"
                         id="targetPeriod"
@@ -61,7 +61,7 @@ export const EditBudget = () => {
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="category" className="form-label">Category</label>
+                    <label htmlFor="category" className="form-label" required>Category <span className="required">*</span></label>
                     <select
                         id="category"
                         className="form-select"
@@ -78,7 +78,7 @@ export const EditBudget = () => {
                     </select>
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="totalExpense" className="form-label">Total Expense (€)</label>
+                    <label htmlFor="totalExpense" className="form-label" required>Total Expense (€) <span className="required">*</span></label>
                     <input
                         type="number"
                         id="totalExpense"
