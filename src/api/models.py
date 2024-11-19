@@ -157,6 +157,7 @@ class Transactions(db.Model):
                 'source': self.source_to.serialize() if self.source_to else None, # esto me permite acceso a los datos de source
                 'category': self.category_to.serialize() if self.category_to else None} 
 
+
 class FixedExpenses(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     description = db.Column(db.String(), unique=False, nullable=False)
