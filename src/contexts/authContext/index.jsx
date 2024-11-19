@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
 
   async function initializeUser(user) {
     if (user) {
-      console.log("User is logged in:", user); // Log user details to console
+      // console.log("User is logged in:", user); // Log user details to console
       setCurrentUser({ ...user });
 
       const isEmail = user.providerData.some(
@@ -55,7 +55,7 @@ export function AuthProvider({ children }) {
 
       setUserLoggedIn(true);
     } else {
-      console.log("No user is logged in."); // Log message when user is not logged in
+      // console.log("No user is logged in."); // Log message when user is not logged in
       setCurrentUser(null);
       setUserLoggedIn(false);
     }

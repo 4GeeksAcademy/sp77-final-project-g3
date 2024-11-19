@@ -46,17 +46,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 			getToken: () => {
 				// esto funciona bien (lo hago trayendo el token desde consola)
 				let token = getStore().token;
-				console.log("Token desde el store:", token);
+				// console.log("Token desde el store:", token);
 
 				if (!token) {
 					token = localStorage.getItem("jwt_token");
-					console.log("Token desde el localStorage:", token);
+					// console.log("Token desde el localStorage:", token);
 					if (token) {
 						setStore({ token });
 					}
-					console.log("Token desde el store:", token);
+					// console.log("Token desde el store:", token);
 				}
-				console.log("Token final:", token);
+				// console.log("Token final:", token);
 				return token;
 			},
 			getMessage: async () => {
@@ -193,7 +193,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return;
 				};
 				const data = await response.json();
-				console.log("These are the connections", data);
+				// console.log("These are the connections", data);
 				setStore({ connections: data.results });
 			},
 			deleteConnection: async (id) => {
@@ -334,8 +334,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const uri = `${getStore().host}/api/transactions`;
 				const token = getStore().token
 
-				console.log("URI de la solicitud:", uri);
-				console.log("Token utilizado:", token);
+				// console.log("URI de la solicitud:", uri);
+				// console.log("Token utilizado:", token);
 
 				const options = {
 					method: 'GET',
@@ -347,7 +347,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const response = await fetch(uri, options);
 
-				console.log("Estado de la respuesta:", response.status, response.statusText);
+				// console.log("Estado de la respuesta:", response.status, response.statusText);
 
 				if (!response.ok) {
 					console.log('Error en la respuesta:', response.status, response.statusText);
@@ -356,8 +356,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const data = await response.json();
 				setStore({ transactions: data.results });
-				console.log("estas son las transactions", getStore().transactions)
-
+				// console.log("estas son las transactions", getStore().transactions)
 			},
 			createTransaction: async (transactionData) => {
 				const uri = `${getStore().host}/api/transactions`;
@@ -437,7 +436,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				console.log("estas son los budgets", getStore().budgets)
 			},
 			createBudget: async (budgetData) => {
-				const token = localStorage.getItem("token"); 
+				const token = localStorage.getItem("token");
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/budgets`, {
 						method: "POST",
@@ -447,20 +446,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 						},
 						body: JSON.stringify(budgetData),
 					});
-			
+
 					if (!response.ok) {
 						throw new Error(`${response.status} ${response.statusText}`);
 					}
-			
+
 					const data = await response.json();
 					console.log("Budget created successfully:", data);
 					return data;
 				} catch (error) {
 					console.error("Error creating budget:", error);
 				}
-			},								
+			},
 			editBudget: async (id, dataToSend) => {
-				const token = localStorage.getItem('token'); 
+				const token = localStorage.getItem('token');
 				const uri = `${process.env.BACKEND_URL}/api/budgets/${id}`;
 				const options = {
 					method: 'PUT',
@@ -482,17 +481,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error('Edit budget failed:', error);
 				}
-			},					
+			},
 			deleteBudgets: async (id) => {
 				const token = localStorage.getItem("token");
 				const uri = `${process.env.BACKEND_URL}/api/budgets/${id}`;
 				const options = {
 					method: "DELETE",
 					headers: {
-						"Authorization": `Bearer ${token}`, 
+						"Authorization": `Bearer ${token}`,
 					},
 				};
-			
+
 				try {
 					const response = await fetch(uri, options);
 					if (!response.ok) {
@@ -503,7 +502,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error during deleteBudgets:", error);
 				}
-			},			
+			},
 			getFixedExpenses: async () => {
 				const uri = `${getStore().host}/api/fixed-expenses`;
 				const token = localStorage.getItem("token");
@@ -558,7 +557,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const data = await response.json();
 				setStore({ balance: data.results });
-				console.log("este es el balance", getStore().balance)
+				// console.log("este es el balance", getStore().balance)
 			},
 			getUser: async (id) => {
 				try {
@@ -606,7 +605,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const data = await response.json();
 				setStore({ sources: data.results });
-				console.log("estas son los sources", getStore().sources)
+				// console.log("estas son los sources", getStore().sources)
 			},
 			createSource: async (sourceData) => {
 				const uri = `${getStore().host}/api/sources`;
@@ -674,7 +673,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 						'Authorization': `Bearer ${token}`
 					},
 				};
-
+				// console.log('URI:', uri);
+				// console.log('Headers:', options.headers);
 				const response = await fetch(uri, options);
 				if (!response.ok) {
 					console.log('Error en la respuesta:', response.status, response.statusText);
@@ -683,7 +683,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				const data = await response.json();
 				setStore({ categories: data.results });
-				console.log("estas son los categories", getStore().categories)
+				// console.log("estas son los categories", getStore().categories)
 			},
 			createCategory: async (transactionData) => {
 				const uri = `${getStore().host}/api/categories`;

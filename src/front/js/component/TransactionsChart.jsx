@@ -46,14 +46,14 @@ export const TransactionsChart = () => {
             {
                 label: 'Income',
                 data: sortedData.map(item => item.income),
-                backgroundColor: 'rgba(34, 139, 34, 0.6)', 
+                backgroundColor: 'rgba(34, 139, 34, 0.6)',
                 borderColor: 'rgba(34, 139, 34, 1)',
                 borderWidth: 1,
             },
             {
                 label: 'Expenses',
                 data: sortedData.map(item => item.expense),
-                backgroundColor: 'rgba(255, 0, 0, 0.6)', 
+                backgroundColor: 'rgba(255, 0, 0, 0.6)',
                 borderColor: 'rgba(255, 0, 0, 1)',
                 borderWidth: 1,
             },
@@ -67,13 +67,13 @@ export const TransactionsChart = () => {
             y: {
                 beginAtZero: true,
                 ticks: {
-                    callback: (value) => `$${value}`, 
+                    callback: (value) => `$${value}`,
                 },
             },
         },
         plugins: {
             legend: {
-                display: true, 
+                display: true,
                 position: 'top',
             },
             title: {
@@ -88,7 +88,9 @@ export const TransactionsChart = () => {
             {store.transactions.length > 0 ? (
                 <Bar data={chartData} options={options} />
             ) : (
-                <p><Spinner /></p>
+                <div className="text-center">
+                    <Spinner />
+                </div>
             )}
         </div>
     );

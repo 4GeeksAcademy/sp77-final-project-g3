@@ -30,7 +30,7 @@ export const Contact = () => {
                 <p>We’re here to help! Whether you have questions, feedback, or need support, feel free to reach out. Our team is dedicated to providing you with the assistance you need as quickly as possible.</p>
             </div>
             <div className="d-flex justify-content-center align-items-center">
-                <div className="container-flex mt-3">
+                <div className="container-flex mt-3 m-sm-3 m-xs-3" style={{width: '800px'}}>
                     <form onSubmit={handleSubmit}>
                         <div className="form-outline mb-4">
                             <label className="form-label" htmlFor="registerName">First Name</label>
