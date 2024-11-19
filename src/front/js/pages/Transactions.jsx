@@ -38,7 +38,7 @@ export const Transactions = () => {
 
 	useEffect(() => {
 		actions.getCategories();
-	 }, []);
+	}, []);
 
 	const handleSubmit = (event) => {
 		event.preventDefault();
@@ -52,8 +52,8 @@ export const Transactions = () => {
 			amount: parseFloat(amount),
 			date: date,
 		}
-		console.log("Datos enviados:", transactionData);
-		console.log("este es token:", store.token);
+		// console.log("Datos enviados:", transactionData);
+		// console.log("este es token:", store.token);
 		actions.createTransaction(transactionData)
 
 		const modal = document.getElementById("NewTransactionModal");
@@ -96,7 +96,7 @@ export const Transactions = () => {
 			date: formatDate(item.date),
 		}
 		actions.setCurrentTransaction(itemEdited)
-		console.log("this is the data to send to current transaction:", itemEdited)
+		// console.log("this is the data to send to current transaction:", itemEdited)
 		navigate('/edit-transaction');
 	}
 
@@ -394,22 +394,41 @@ export const Transactions = () => {
 						</tbody>
 					</table>
 
-					{/* Paginación */}
 					<nav aria-label="Page navigation" className="mt-3">
 						<ul className="pagination justify-content-center">
-							{Array.from({ length: totalPages }, (_, index) => (
-								<li key={index} className={`page-item ${currentPage === index + 1 ? "active" : ""}`}>
-									<button className="page-link"
-										onClick={() => handlePageChange(index + 1)}
-										style={{
-											backgroundColor: currentPage === index + 1 ? "#2D3748" : "white",
-											color: currentPage === index + 1 ? "white" : "#2D3748",
-											border: `1px solid #2D3748`,
-										}}>
-										{index + 1}
-									</button>
-								</li>
-							))}
+							<li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+								<button
+									className="page-link"
+									onClick={() => handlePageChange(currentPage - 1)}
+									disabled={currentPage === 1}
+									style={{
+										backgroundColor: "#2D3748",
+										color: "white",
+										border: "1px solid #2D3748",
+									}}
+								>
+									Previous
+								</button>
+							</li>
+							<li className="page-item">
+								<span className="page-link" style={{ backgroundColor: "white", color: "#2D3748" }}>
+									Page {currentPage} of {totalPages}
+								</span>
+							</li>
+							<li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+								<button
+									className="page-link"
+									onClick={() => handlePageChange(currentPage + 1)}
+									disabled={currentPage === totalPages}
+									style={{
+										backgroundColor: "#2D3748",
+										color: "white",
+										border: "1px solid #2D3748",
+									}}
+								>
+									Next
+								</button>
+							</li>
 						</ul>
 					</nav>
 				</div>
