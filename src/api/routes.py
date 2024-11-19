@@ -346,7 +346,7 @@ def bank_transactions():
             amount = transaction_data.get('amount')
             transaction_type = 'expense' if amount < 0 else 'income'
             new_transaction = Transactions(yapily_id=transaction_data.get('id'),
-                                           amount=amount,
+                                           amount=abs(amount),
                                            type=transaction_type,
                                            description=transaction_data.get('description'),
                                            date=transaction_data.get('date'),
@@ -403,7 +403,6 @@ def source(id):
         row.name = data.get('name')
         row.type_source = data.get('type_source')
         row.amount = data.get('amount')
-        row.user_id = data.get('user_id')
         db.session.commit()
         response_body['message'] = "All changes were saved (PUT)"
         response_body['results'] = row.serialize()

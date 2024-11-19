@@ -31,14 +31,16 @@ const injectContext = PassedComponent => {
 		*/
 		useEffect(() => {
 			state.actions.getToken();
-			state.actions.getInstitutions();
-			state.actions.getConnections();
-			state.actions.getTransactions();
-			// state.actions.getBudgets();
-			// state.actions.getFixedExpenses();
-			state.actions.getSources();
-			// state.actions.getBalance();
-			// state.actions.getCategories();
+			if (state.store.token) {
+				state.actions.getInstitutions();
+				state.actions.getConnections();
+				state.actions.getTransactions();
+				state.actions.getBudgets();
+				state.actions.getFixedExpenses();
+				state.actions.getSources();
+				state.actions.getBalance();
+				state.actions.getCategories();
+			}
 			
 
 			// Calling this function from the flux.js actions
