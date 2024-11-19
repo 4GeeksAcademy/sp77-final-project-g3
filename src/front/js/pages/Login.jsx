@@ -6,6 +6,7 @@ export const Login = () => {
     const { actions, store } = useContext(Context);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [visible, setVisible] = useState(false);
     const [registerEmail, setRegisterEmail] = useState('');
     const [registerPassword, setRegisterPassword] = useState('');
     const [registerRepeatPassword, setRegisterRepeatPassword] = useState('');
@@ -67,8 +68,11 @@ export const Login = () => {
                                 <label className="form-label" htmlFor="loginName">Email</label>
                             </div>
                             <div className="form-outline mb-2">
-                                <input type="password" id="loginPassword" required value={password} onChange={handlePassword} className="form-control" />
+                                <input type={visible ? 'text' : 'password'} id="loginPassword" required value={password} onChange={handlePassword} className="form-control" />
                                 <label className="form-label" htmlFor="loginPassword">Password</label>
+                                <div style={{ position: 'relative', left: '88%', transform: 'translateY(-265%)', cursor: 'pointer' }} onClick={() => setVisible(!visible)}>
+                                   {visible ? <i className="fas fa-eye-slash"></i> : <i className="fas fa-eye"></i>}
+                               </div>
                                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                             </div>
                             <div className="row mb-3">

@@ -17,6 +17,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			sources: [],
 			categories: [],
 			currentCategory: [],
+			currentSource: {},
 			currentTransaction: {},
 		},
 
@@ -583,7 +584,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error en la conexión al backend:", error);
 				}
 			},
-			setCurrentSource: (Source) => { setStore({ Source: Source }) },
+			setCurrentSource: (Source) => { setStore({ currentSource: Source }) },
 			getSources: async () => {
 				const uri = `${getStore().host}/api/sources`;
 				const token = localStorage.getItem("token");
@@ -643,7 +644,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return
 				}
 				getActions().setCurrentSource({});
-				getActions().getSources();
+				await getActions().getSources();
 			},
 			deleteSource: async (id) => {
 				const uri = `${getStore().host}/api/sources/${id}`;
