@@ -19,6 +19,11 @@ export const Sidebar = () => {
         }
     };
 
+    const handleTransactions = () => {
+        actions.getTransactions();
+        actions.getBalance();
+    }
+
     return (
         <>
             {/* Sidebar para pantallas grandes */}
@@ -40,7 +45,7 @@ export const Sidebar = () => {
                         </Link>
                     </li>
                     <li className="mb-3 ms-2">
-                        <Link className="fw-bold sidebar-link" to="/transactions">
+                        <Link className="fw-bold sidebar-link" to="/transactions" onClick={handleTransactions}>
                             <i className="fa-solid fa-money-bill-transfer bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                             Transactions
                         </Link>
