@@ -143,7 +143,7 @@ export const Dashboard = () => {
 						<div className="col-md-4">
 							<div className="card text-center fixed-card">
 								<div className="card-body">
-									<h4 class="card-title mb-4">Biggest budget</h4>
+									<h4 className="card-title mb-4">Biggest budget</h4>
 									{/* Find the budget with the highest budget_amount */}
 									{store.budgets.length > 0 ? (
 										(() => {

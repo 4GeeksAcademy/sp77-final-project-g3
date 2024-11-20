@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Context } from "../store/appContext.js";
 import { Link } from "react-router-dom";
 import "../../styles/budgets.css";
@@ -14,7 +14,7 @@ export const Budgets = () => {
     const [targetPeriodOrder, setTargetPeriodOrder] = useState("");
     const [expenseOrder, setExpenseOrder] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-
+    const modalRef = useRef(null);
     const uniqueBudgets = Array.from(new Map(store.budgets.map(b => [b.id, b])).values());
 
     useEffect(() => {
@@ -59,20 +59,20 @@ export const Budgets = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
         const budgetData = {
             budget_amount: budgetAmount.toString(),
             target_period: targetPeriod.split("T")[0],
             category_id: category,
             total_expense: "0"
         };
-
         console.log("Budget data being sent:", budgetData);
         actions.createBudget(budgetData).then(() => {
             actions.getBudgets();
             setBudgetAmount("");
             setTargetPeriod("");
             setCategory("");
+            const modal = bootstrap.Modal.getInstance(modalRef.current);
+            modal.hide();
         });
     };
 
@@ -123,7 +123,7 @@ export const Budgets = () => {
                         <i className="fas fa-plus"></i> Add Budget
                     </button>
                 </div>
-                <div className="modal fade" id="NewBudgetModal" tabIndex="-1" aria-hidden="true">
+                <div className="modal fade" id="NewBudgetModal" tabIndex="-1" aria-hidden="true" ref={modalRef}>
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

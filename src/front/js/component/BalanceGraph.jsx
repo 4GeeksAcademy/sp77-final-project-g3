@@ -85,13 +85,9 @@ export const BalanceGraph = () => {
 
     return (
         <div className='card mb-3 mt-3 p-3' style={{ width: '100%', height: '200px', margin: 'auto' }}>
-            {store.transactions.length > 0 ? (
+            
                 <Bar data={chartData} options={options} />
-            ) : (
-                <div className="text-center">
-                    <Spinner />
-                </div>
-            )}
+           
         </div>
     );
 };
