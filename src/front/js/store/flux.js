@@ -9,7 +9,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			isLogged: Boolean(localStorage.getItem('token')),
 			transactions: [],
 			budgets: [],
-			balance: {},
+			balance: {
+				monthly_income: 0
+			},
 			institutions: [],
 			connections: [],
 			fixedExpenses: [],
@@ -19,6 +21,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			currentCategory: [],
 			currentSource: {},
 			currentTransaction: {},
+			monthlyIncome: 0,
+			monthlyExpense: 0,
+			totalBalance: 0,
 		},
 
 		actions: {
@@ -58,6 +63,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				// console.log("Token final:", token);
 				return token;
+			},
+			getBalanceData: () => {
+				const transactions = getStore().transactions;
+				console.log('Esto es transactions:', transactions);
+				const income = transactions
+					.filter(item => item.type === 'income')
+					.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+				console.log('Esto es el income:', income);
+				setStore({ monthlyIncome: income });
+
+				// expense  // <-- Depuración inicial
+				const expense = transactions
+					.filter(item => item.type === 'expense')
+					.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+				console.log('Esto es el expense:', expense);
+				setStore({ monthlyExpense: expense });
+
+				const total_balance = getStore().monthlyIncome - getStore().monthlyExpense
+				setStore({ totalBalance: total_balance });
+				console.log('Esto es el total balance:', total_balance);
 			},
 			getMessage: async () => {
 				const uri = `${process.env.BACKEND_URL}/api/hello`
@@ -138,6 +163,15 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				getActions().setCurrentuser({});
 				getActions().getuser();
+			},
+			setIncomeInStore: (totalIncome) => {
+				setStore((prevStore) => ({
+					...prevStore, // Conserva las propiedades actuales del store
+					balance: {
+						...prevStore.balance, // Conserva las propiedades actuales del balance
+						montly_income: totalIncome, // Actualiza solo montly_income
+					},
+				}));
 			},
 			deleteUser: async (id) => {
 				try {
@@ -357,6 +391,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const data = await response.json();
 				setStore({ transactions: data.results });
 				// console.log("estas son las transactions", getStore().transactions)
+				getActions().getBalanceData();
 			},
 			createTransaction: async (transactionData) => {
 				const uri = `${getStore().host}/api/transactions`;

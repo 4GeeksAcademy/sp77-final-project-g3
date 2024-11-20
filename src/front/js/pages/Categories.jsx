@@ -124,7 +124,7 @@ export const Categories = () => {
 						<tbody>
 							{!store.categories || store.categories.length === 0 ? (
 								<tr>
-									<td colSpan="4"> <div className="m-3"> <Spinner /> </div></td>
+									<td colSpan="4"> <div className="m-3 d-flex justify-content-center"> No Categories available yet </div></td>
 								</tr>
 							) : (
 								store.categories.map((item, index) => (
