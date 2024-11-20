@@ -55,12 +55,12 @@ export const Sidebar = () => {
                         Budgets
                     </Link>
                 </li>
-                <li className="mb-3 ms-2">
+                {/* <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/balance">
                         <i className="fa-solid fa-scale-balanced bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                         Balance
                     </Link>
-                </li>
+                </li> */}
                 <li className="mb-3 ms-2">
                     <Link className="fw-bold sidebar-link" to="/categories">
                         <i className="fa-solid fa-layer-group bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
@@ -98,8 +98,8 @@ export const Sidebar = () => {
                     <li><a className="dropdown-item" onClick={handleLogout} href="#">Sign out</a></li>
                 </ul>
             </div>
-            <div className="sidebar-footer">
-                <span>© ExpenseVue</span>
+            <div className="sidebar-footer mt-4">
+                <span >© ExpenseVue</span>
             </div>
         </div>
     );
