@@ -30,6 +30,10 @@ export const EditSource = () => {
         navigate('/connections');
     };
 
+    const handleSources =() => {
+        actions.getSources();
+    }
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="form-outline mb-4">
@@ -53,7 +57,7 @@ export const EditSource = () => {
             </div>
             <div className="modal-footer">
                 <button type="reset" onClick={handleReset} className="btn btn-danger">Cancel</button>
-                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Edit Source</button>
+                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} onClick={handleSources}>Edit Source</button>
             </div>
         </form>
     )

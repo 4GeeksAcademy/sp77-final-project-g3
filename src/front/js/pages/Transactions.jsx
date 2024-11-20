@@ -71,6 +71,8 @@ export const Transactions = () => {
 		setDate('');
 		setCategory('');
 		setSource('');
+
+		actions.getTransactions();
 		navigate('/transactions')
 	}
 
@@ -140,6 +142,11 @@ export const Transactions = () => {
 		setFilteredTransactions(store.transactions);
 	};
 
+	const handleTransactions = () => {
+		actions.getTransactions();
+		actions.getCurrentTransactions();
+	}
+
 	return (
 		<div className="transactions-container">
 			<div>
@@ -149,7 +156,6 @@ export const Transactions = () => {
 							<div className="col">
 								<h2>Transactions</h2>
 								<p>Welcome to your transactions</p>
-								<button type="button" className="btn" >set income</button>
 							</div>
 							<div className="col-auto">
 								<button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#NewTransactionModal" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>New Transaction</button>
@@ -246,7 +252,7 @@ export const Transactions = () => {
 															required />
 													</div>
 													<div className="modal-footer">
-														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Create Transaction</button>
+														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} onClick={handleTransactions}>Create Transaction</button>
 													</div>
 												</form>
 											</div>
@@ -417,12 +423,13 @@ export const Transactions = () => {
 						<tbody>
 							{!currentTransactions || currentTransactions.length === 0 ? (
 								<tr>
-									<td colSpan="4"> <div className="m-3"> <Spinner /> </div></td>
+									<td colSpan="7"> <div className="m-3 d-flex justify-content-center"> No Transactions Available </div></td>
 								</tr>
 							) : (
 								currentTransactions.map((item, index) => (
 									<tr key={item.id}>
 										<td>{!item.name ? 'Transaction' : item.name}</td>
+										<td>{!item.description ? 'This is a description for a Transaction' : item.description}</td>
 										<td>
 											{(() => {
 												switch (item.source.type_source) {

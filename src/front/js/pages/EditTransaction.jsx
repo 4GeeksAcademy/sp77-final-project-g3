@@ -37,6 +37,11 @@ export const EditTransaction = () => {
         navigate('/transactions')
     }
 
+    const handleTransactions = () => {
+        actions.getTransactions();
+        actions.getCurrentTransactions();
+    }
+
     const handleReset = () => { navigate('/transactions') };
 
     return (
@@ -116,7 +121,7 @@ export const EditTransaction = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="reset" onClick={handleReset} className="btn btn-danger">Cancel </button>
-                                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Edit Transaction</button>
+                                <button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} onClick={handleTransactions}>Edit Transaction</button>
                             </div>
                         </form>
     )
