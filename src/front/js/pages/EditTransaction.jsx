@@ -33,7 +33,7 @@ export const EditTransaction = () => {
         console.log("Current transaction:", currentTransaction);
         console.log("Current transaction id:", currentTransaction.id);
         actions.editTransaction(currentTransaction.id, dataToSend);
-        actions.getTransactions()
+        actions.getTransactions();
         navigate('/transactions')
     }
 
