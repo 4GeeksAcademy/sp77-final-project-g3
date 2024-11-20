@@ -38,6 +38,7 @@ export const Transactions = () => {
 
 	useEffect(() => {
 		actions.getCategories();
+
 	}, []);
 
 	const handleSubmit = (event) => {
@@ -55,6 +56,7 @@ export const Transactions = () => {
 		// console.log("Datos enviados:", transactionData);
 		// console.log("este es token:", store.token);
 		actions.createTransaction(transactionData)
+
 
 		const modal = document.getElementById("NewTransactionModal");
 		if (modal) {
@@ -137,6 +139,16 @@ export const Transactions = () => {
 		setFilteredTransactions(store.transactions);
 	};
 
+	useEffect(() => {
+		console.log('store.transactions:', store.transactions); // Verifica que las transacciones estén disponibles
+		actions.setIncomeInStore();
+	}, [store.transactions]);
+
+	const handleIncome = () => {
+		console.log('buton clickeado')
+		actions.getBalanceData();
+	}
+
 	return (
 		<div className="transactions-container">
 			<div>
@@ -146,6 +158,7 @@ export const Transactions = () => {
 							<div className="col">
 								<h2>Transactions</h2>
 								<p>Welcome to your transactions</p>
+								<button type="button" className="btn" onClick={handleIncome} >set income</button>
 							</div>
 							<div className="col-auto">
 								<button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#NewTransactionModal" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>New Transaction</button>
@@ -260,13 +273,19 @@ export const Transactions = () => {
 								<div className="col-12 col-md-4">
 									<div className="card text-center p-3">
 										{!store.balance || Object.keys(store.balance).length === 0 ? (
-											<div className="m-3"><Spinner /></div>
+											<div>
+												<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Income <br />
+													€0
+												</p>
+											</div>
 										) : (
 											<div>
 												<FontAwesomeIcon icon={faCircleArrowUp} style={{ color: "#3eac65", fontSize: "2rem" }} />
 												<p className="mt-2 mb-0">
 													Income <br />
-													€{store.balance.monthly_income}
+													€{store.monthlyIncome}
 												</p>
 											</div>
 										)}
@@ -277,13 +296,19 @@ export const Transactions = () => {
 								<div className="col-12 col-md-4">
 									<div className="card text-center p-3">
 										{!store.balance || Object.keys(store.balance).length === 0 ? (
-											<div className="m-3"><Spinner /></div>
+											<div>
+												<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Expenses <br />
+													€0
+												</p>
+											</div>
 										) : (
 											<div>
 												<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
 												<p className="mt-2 mb-0">
 													Expenses <br />
-													€{store.balance.monthly_expenses}
+													€{store.monthlyExpense}
 												</p>
 											</div>
 										)}
@@ -294,14 +319,30 @@ export const Transactions = () => {
 								<div className="col-12 col-md-4">
 									<div className="card text-center p-3 align-items-center justify-content-center">
 										{!store.balance || Object.keys(store.balance).length === 0 ? (
-											<div className="m-3"><Spinner /></div>
+											<div>
+												<FontAwesomeIcon icon={faChartLine} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
+												<p className="mt-2 mb-0">
+													Balance <br />
+													€0
+												</p>
+											</div>
 										) : (
 											<div>
 												<FontAwesomeIcon icon={faChartLine} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
 												<p className="mt-2 mb-0">
 													Balance <br />
-													€{store.balance.total_balance}
+													{store.totalBalance >= 0 ? (
+														<>
+															<span>€</span> {store.totalBalance}
+														</>
+													) : (
+														<>
+															<span style={{ color: 'red' }}>-€</span>
+															<span style={{ color: 'red' }}>{Math.abs(store.totalBalance)}</span>
+														</>
+													)}
 												</p>
+
 											</div>
 										)}
 									</div>
@@ -389,7 +430,7 @@ export const Transactions = () => {
 							) : (
 								currentTransactions.map((item, index) => (
 									<tr key={item.id}>
-										<td>{item.name}</td>
+										<td>{!item.name ? 'Transaction' : item.name}</td>
 										<td>
 											{(() => {
 												switch (item.source.type_source) {

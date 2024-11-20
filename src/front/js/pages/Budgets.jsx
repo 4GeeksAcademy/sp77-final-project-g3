@@ -133,7 +133,7 @@ export const Budgets = () => {
                             <div className="modal-body">
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-3">
-                                        <label htmlFor="budgetAmount" className="form-label" required >
+                                        <label htmlFor="budgetAmount" className="form-label">
                                             Budget Amount (€) <span className="required">*</span>
                                         </label>
                                         <input
@@ -146,7 +146,7 @@ export const Budgets = () => {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="targetPeriod" className="form-label" required >
+                                        <label htmlFor="targetPeriod" className="form-label">
                                             Target Period <span className="required">*</span>
                                         </label>
                                         <input
@@ -159,7 +159,7 @@ export const Budgets = () => {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="category" className="form-label" required>
+                                        <label htmlFor="category" className="form-label">
                                             Category <span className="required">*</span>
                                         </label>
                                         <select
@@ -191,7 +191,7 @@ export const Budgets = () => {
                                         <small className="form-text text-muted">Edit this once you know the actual total expense.</small>
                                     </div>
                                     <div className="text-end">
-                                        <button type="submit" className="btn btn-dark" data-bs-dismiss="modal">
+                                        <button type="submit" className="btn btn-dark">
                                             Save Budget
                                         </button>
                                     </div>
