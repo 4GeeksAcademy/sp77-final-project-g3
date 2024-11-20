@@ -140,11 +140,6 @@ export const Transactions = () => {
 		setFilteredTransactions(store.transactions);
 	};
 
-	useEffect(() => {
-		console.log('store.transactions:', store.transactions); // Verifica que las transacciones estén disponibles
-		actions.setIncomeInStore();
-	}, [store.transactions]);
-
 	return (
 		<div className="transactions-container">
 			<div>
@@ -154,6 +149,7 @@ export const Transactions = () => {
 							<div className="col">
 								<h2>Transactions</h2>
 								<p>Welcome to your transactions</p>
+								<button type="button" className="btn" >set income</button>
 							</div>
 							<div className="col-auto">
 								<button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#NewTransactionModal" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>New Transaction</button>
@@ -427,7 +423,6 @@ export const Transactions = () => {
 								currentTransactions.map((item, index) => (
 									<tr key={item.id}>
 										<td>{!item.name ? 'Transaction' : item.name}</td>
-										<td>{!item.description ? 'This is a Transaction' : item.description}</td>
 										<td>
 											{(() => {
 												switch (item.source.type_source) {

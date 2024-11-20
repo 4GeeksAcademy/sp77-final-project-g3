@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<<< HEAD:migrations/versions/bb8f62a06e9f_.py
-Revision ID: bb8f62a06e9f
+Revision ID: a99c076d3ce5
 Revises: 
-Create Date: 2024-11-19 20:03:52.849228
-========
-Revision ID: 0813c3fbab85
-Revises: 
-Create Date: 2024-11-19 11:03:48.416019
->>>>>>>> 93e5762fa84179acbc25e3324d35e544fa2bd813:migrations/versions/0813c3fbab85_.py
+Create Date: 2024-11-19 16:28:53.502737
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:migrations/versions/bb8f62a06e9f_.py
-revision = 'bb8f62a06e9f'
-========
-revision = '0813c3fbab85'
->>>>>>>> 93e5762fa84179acbc25e3324d35e544fa2bd813:migrations/versions/0813c3fbab85_.py
+revision = 'a99c076d3ce5'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -61,7 +51,7 @@ def upgrade():
     sa.Column('monthly_expenses', sa.Float(), nullable=False),
     sa.Column('monthly_income', sa.Float(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('user_id')
     )
@@ -70,7 +60,7 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('connections',
@@ -79,7 +69,7 @@ def upgrade():
     sa.Column('institution_id', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['institution_id'], ['institutions.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('consent_token')
     )
@@ -89,7 +79,7 @@ def upgrade():
     sa.Column('target_period', sa.DateTime(), nullable=False),
     sa.Column('total_expense', sa.Float(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('fixed_expenses',
@@ -101,7 +91,7 @@ def upgrade():
     sa.Column('next_date', sa.DateTime(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=True),
     sa.Column('is_active_next_period', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('sources',
@@ -113,7 +103,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('connection_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['connection_id'], ['connections.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('transactions',
@@ -127,7 +117,7 @@ def upgrade():
     sa.Column('source_id', sa.Integer(), nullable=True),
     sa.Column('category_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
-    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ),
+    sa.ForeignKeyConstraint(['source_id'], ['sources.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

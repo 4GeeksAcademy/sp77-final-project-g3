@@ -19,12 +19,21 @@ export const Sidebar = () => {
         }
     };
 
+    const closeOffcanvas = () => {
+        const offcanvas = document.getElementById('offcanvasSidebar');
+        const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvas);
+        if (offcanvasInstance) {
+            offcanvasInstance.hide();
+        }
+    };
+
     const handleTransactions = () => {
         actions.getTransactions();
         actions.getBalance();
     }
-
+    
     return (
+
         <>
             {/* Sidebar para pantallas grandes */}
             <div className="sidebar-container d-none d-lg-block">
@@ -54,12 +63,6 @@ export const Sidebar = () => {
                         <Link className="fw-bold sidebar-link" to="/budgets">
                             <i className="fa-solid fa-sack-dollar bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                             Budgets
-                        </Link>
-                    </li>
-                    <li className="mb-3 ms-2">
-                        <Link className="fw-bold sidebar-link" to="/balance">
-                            <i className="fa-solid fa-scale-balanced bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                            Balance
                         </Link>
                     </li>
                     <li className="mb-3 ms-2">
@@ -108,10 +111,11 @@ export const Sidebar = () => {
                     <span>© ExpenseVue</span>
                 </div>
             </div>
+
             {/* Sidebar con menú hamburguesa para móviles */}
             <nav className="bg-mobile navbar navbar-expand-lg navbar-dark bg-dark d-lg-none">
                 <div className="container-fluid">
-                    <Link to="/" className="navbar-brand">
+                    <Link to="/" className="navbar-brand" onClick={() => closeOffcanvas()}>
                         <img height="50" src={logoExpenseVue} alt="Logo ExpenseVue" />
                     </Link>
                     <button
@@ -130,7 +134,7 @@ export const Sidebar = () => {
                         aria-labelledby="offcanvasSidebarLabel"
                     >
                         <div className="offcanvas-header">
-                            <Link to="/" className="navbar-brand">
+                            <Link to="/" className="navbar-brand" onClick={() => closeOffcanvas()}>
                                 <img height="50" src={logoExpenseVue} alt="Logo ExpenseVue" />
                             </Link>
                             <button
@@ -143,54 +147,48 @@ export const Sidebar = () => {
                         <div className="offcanvas-body">
                             <ul className="nav flex-column">
                                 <li className="nav-item mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/">
+                                    <Link className="fw-bold sidebar-link" to="/" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-home bi pe-none me-2"></i> Home
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/dashboard">
+                                    <Link className="fw-bold sidebar-link" to="/dashboard" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-table-columns bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Dashboard
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/transactions">
+                                    <Link className="fw-bold sidebar-link" to="/transactions" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-money-bill-transfer bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Transactions
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/budgets">
+                                    <Link className="fw-bold sidebar-link" to="/budgets" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-sack-dollar bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Budgets
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/balance">
-                                        <i className="fa-solid fa-scale-balanced bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
-                                        Balance
-                                    </Link>
-                                </li>
-                                <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/categories">
+                                    <Link className="fw-bold sidebar-link" to="/categories" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-layer-group bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Categories
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/connections">
+                                    <Link className="fw-bold sidebar-link" to="/connections" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-circle-nodes bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Connections
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/faq">
+                                    <Link className="fw-bold sidebar-link" to="/faq" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-circle-question bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         FAQ
                                     </Link>
                                 </li>
                                 <li className="mb-3 ms-2">
-                                    <Link className="fw-bold sidebar-link" to="/contact">
+                                    <Link className="fw-bold sidebar-link" to="/contact" onClick={() => closeOffcanvas()}>
                                         <i className="fa-solid fa-envelope bi pe-none me-2" style={{ width: '16', height: '16' }}></i>
                                         Contact
                                     </Link>
@@ -208,7 +206,7 @@ export const Sidebar = () => {
                                     <strong className="user-settings">{store.user?.first_name} {store.user?.last_name}</strong>
                                 </a>
                                 <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
-                                    <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
+                                    <li><Link className="dropdown-item" to="/profile" onClick={() => closeOffcanvas()}>Profile</Link></li>
                                     <li><hr className="dropdown-divider" /></li>
                                     <li><a className="dropdown-item" onClick={handleLogout} href="#">Sign out</a></li>
                                 </ul>
