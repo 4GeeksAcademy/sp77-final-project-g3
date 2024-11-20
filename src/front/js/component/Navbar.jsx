@@ -22,41 +22,52 @@ export const Navbar = () => {
         }
     };
 
+    const closeOffcanvas = () => {
+        const offcanvas = document.getElementById('offcanvasNavbar2');
+        if (offcanvas) {
+            const offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvas);
+            console.log(offcanvasInstance); // Verifica si se obtiene la instancia
+            if (offcanvasInstance) {
+                offcanvasInstance.hide();
+            }
+        }
+    };    
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light" aria-label="Offcanvas navbar large" style={{ backgroundColor: '#ffc107' }}>
             <div className="container">
-                <Link to="/" className="navbar-brand">
+                <Link to="/" className="navbar-brand" onClick={() => closeOffcanvas()}>
                     <img className="mx-4" height="70" src={logoExpenseVue} alt="ExpenseVue Logo" />
                 </Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar2" aria-controls="offcanvasNavbar2">
-                    <span className="navbar-toggler-icon" style={{ color: 'black' }}></span>
+                    <span className="navbar-toggler-icon" style={{ color: '#2D3748' }}></span>
                 </button>
                 <div className="offcanvas offcanvas-end text-bg-dark" tabIndex="-1" id="offcanvasNavbar2" aria-labelledby="offcanvasNavbar2Label">
                     <div className="offcanvas-header">
-                        <Link to="/" className="navbar-brand">
+                        <Link to="/" className="navbar-brand" onClick={() => closeOffcanvas()}>
                             <img className="mb-4 mt-2 mx-5" height="80" src={logoExpenseVue} alt="Logo ExpenseVue" />
                         </Link>                        <button type="button" className="btn-close btn-close-dark" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div className="offcanvas-body">
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
                             <li className="nav-item">
-                                <Link className="nav-link fw-bold" to="/">
+                                <Link className="nav-link fw-bold" to="/" onClick={() => closeOffcanvas()}>
                                     Home
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link fw-bold" to="/faq">
+                                <Link className="nav-link fw-bold" to="/faq" onClick={() => closeOffcanvas()}>
                                     FAQ
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link fw-bold" to="/contact">
+                                <Link className="nav-link fw-bold" to="/contact" onClick={() => closeOffcanvas()}>
                                     Contact
                                 </Link>
                             </li>
                             {isLogged && (
                                 <li className="nav-item me-3">
-                                    <Link to="/dashboard">
+                                    <Link to="/dashboard" onClick={() => closeOffcanvas()}>
                                         <button id="boton-dashboard" className="btn fw-bold">
                                             Go to Dashboard
                                         </button>
@@ -69,7 +80,7 @@ export const Navbar = () => {
                                         Logout
                                     </button>
                                 ) : (
-                                    <Link to="/login">
+                                    <Link to="/login" onClick={() => closeOffcanvas()}>
                                         <button id="boton-login" className="btn fw-bold">
                                             Login
                                         </button>

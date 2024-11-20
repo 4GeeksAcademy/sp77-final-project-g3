@@ -1,5 +1,6 @@
 import React from "react";
 import "../../styles/index.css";
+import { Link } from "react-router-dom";
 
 
 export const Faq = () => {
@@ -118,7 +119,7 @@ export const Faq = () => {
                     </h2>
                     <div id="flush-collapseNine" className="accordion-collapse collapse" aria-labelledby="flush-headingNine" data-bs-parent="#accordionFlushExample">
                         <div className="accordion-body">
-                            You can reach out to us by filling out the form in the "Contact" section of our website. Our support team will get back to you as soon as possible to assist with any questions or concerns.
+                            You can reach out to us by filling out the form in the <Link to="/contact">"Contact"</Link> section of our website. Our support team will get back to you as soon as possible to assist with any questions or concerns.
                         </div>
                     </div>
                 </div>

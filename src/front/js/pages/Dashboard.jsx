@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext.js";
 import "../../styles/dashboard.css";
+import { BalanceGraph } from "../component/BalanceGraph.jsx"; 
 
 
 export const Dashboard = () => {
@@ -44,10 +45,12 @@ export const Dashboard = () => {
 	return (
 		<>
 			<div className="container my-4">
-
-				{/* title */}
-				<div className="row mb-2"><h2>Dashboard</h2></div>
-				<div className="container my-4">
+			<header className="text-center">
+                <h2 className="text-dark">Welcome {store.user?.first_name} {store.user?.last_name}</h2>
+                <p className="text-muted">Here, you can track and manage your financial health with ease.</p>
+            </header>
+				<BalanceGraph />
+				<div className="container my-4 pt-4">
 
 					{/* Row for Horizontal Cards */}
 					<div className="row">
