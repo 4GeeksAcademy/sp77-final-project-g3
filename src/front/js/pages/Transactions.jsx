@@ -100,6 +100,7 @@ export const Transactions = () => {
 		actions.setCurrentTransaction(itemEdited)
 		// console.log("this is the data to send to current transaction:", itemEdited)
 		navigate('/edit-transaction');
+		actions.getTransactions();
 	}
 
 	const applyFilter = (criteria, value) => {
@@ -139,16 +140,6 @@ export const Transactions = () => {
 		setFilteredTransactions(store.transactions);
 	};
 
-	useEffect(() => {
-		console.log('store.transactions:', store.transactions); // Verifica que las transacciones estén disponibles
-		actions.setIncomeInStore();
-	}, [store.transactions]);
-
-	const handleIncome = () => {
-		console.log('buton clickeado')
-		actions.getBalanceData();
-	}
-
 	return (
 		<div className="transactions-container">
 			<div>
@@ -158,7 +149,7 @@ export const Transactions = () => {
 							<div className="col">
 								<h2>Transactions</h2>
 								<p>Welcome to your transactions</p>
-								<button type="button" className="btn" onClick={handleIncome} >set income</button>
+								<button type="button" className="btn" >set income</button>
 							</div>
 							<div className="col-auto">
 								<button type="button" className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#NewTransactionModal" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>New Transaction</button>
@@ -308,7 +299,7 @@ export const Transactions = () => {
 												<FontAwesomeIcon icon={faCircleArrowDown} style={{ color: "#ea1a2f", fontSize: "2rem" }} />
 												<p className="mt-2 mb-0">
 													Expenses <br />
-													€{store.monthlyExpense}
+													-€{store.monthlyExpense}
 												</p>
 											</div>
 										)}
@@ -417,6 +408,7 @@ export const Transactions = () => {
 							</tr>
 							<tr>
 								<th>Transaction</th>
+								<th>Description</th>
 								<th>Type</th>
 								<th>Date</th>
 								<th>Amount</th>
