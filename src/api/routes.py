@@ -68,38 +68,6 @@ def login():
     return response_body, 200
 
 
-@api.route('/profile', methods=['PUT'])
-@jwt_required()
-def profile():
-    response_body = {}
-    current_user = get_jwt_identity()
-    row = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
-    data = request.json
-    row.email = data.get('email')
-    row.first_name = data.get('first_name')
-    row.last_name = data.get('last_name')
-    row.phone_number = data.get('phone_number')
-    row.country = data.get('country')
-    row.photo_url = data.get('photo_url')
-    db.session.commit()
-    response_body['message'] = "Profile updated!"
-    response_body['results'] = row.serialize()
-    return response_body, 200
-
-
-@api.route('/remove-account', methods=['DELETE'])
-@jwt_required()
-def remove_account():
-    response_body = {}
-    current_user = get_jwt_identity()
-    account = db.session.execute(db.select(Users).where(Users.id == current_user['user_id'])).scalar()
-    db.session.delete(account)
-    db.session.commit()
-    response_body['message'] = "Your account was successfully removed!"
-    response_body['results'] = {}
-    return response_body, 200
-
-
 @api.route('/institutions', methods=['GET'])
 def institutions():
     response_body = {}
@@ -346,7 +314,7 @@ def bank_transactions():
             amount = transaction_data.get('amount')
             transaction_type = 'expense' if amount < 0 else 'income'
             new_transaction = Transactions(yapily_id=transaction_data.get('id'),
-                                           amount=amount,
+                                           amount=abs(amount),
                                            type=transaction_type,
                                            description=transaction_data.get('description'),
                                            date=transaction_data.get('date'),
@@ -403,7 +371,6 @@ def source(id):
         row.name = data.get('name')
         row.type_source = data.get('type_source')
         row.amount = data.get('amount')
-        row.user_id = data.get('user_id')
         db.session.commit()
         response_body['message'] = "All changes were saved (PUT)"
         response_body['results'] = row.serialize()
@@ -716,6 +683,13 @@ def user(id):
         response_body['results'] = row.serialize()
         return response_body, 200
     if request.method == 'DELETE':
+        db.session.execute(db.delete(Transactions).where(Transactions.source_id.in_(db.session.execute(db.select(Sources.id).where(Sources.user_id == id)).scalars())))
+        db.session.execute(db.delete(Sources).where(Sources.user_id == id))
+        db.session.execute(db.delete(Connections).where(Connections.user_id == id))
+        db.session.execute(db.delete(Balances).where(Balances.user_id == id))
+        db.session.execute(db.delete(FixedExpenses).where(FixedExpenses.category_id.in_(db.session.execute(db.select(Categories.id).where(Categories.user_id == id)).scalars())))
+        db.session.execute(db.delete(Budgets).where(Budgets.category_id.in_(db.session.execute(db.select(Categories.id).where(Categories.user_id == id)).scalars())))
+        db.session.execute(db.delete(Categories).where(Categories.user_id == id))
         db.session.delete(row)
         db.session.commit()
         response_body['message'] = f'User {id} deleted'

@@ -2,3 +2,8 @@
     font-size: 1.3em;
 }
 
+.required {
+    color: red;
+    margin-left: 0.2rem; /* Espaciado opcional */
+    font-weight: bold;
+}

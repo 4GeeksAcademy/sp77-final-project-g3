@@ -29,7 +29,9 @@ class Users(db.Model):
                 'phone_number': self.phone_number,
                 'photo_url': self.photo_url,
                 'yapily_username': self.yapily_username,
-                'yapily_id': self.yapily_id}
+                'yapily_id': self.yapily_id,
+                'reset_token': self.reset_token,
+                'token_expiration': self.token_expiration}
 
 
 class Institutions(db.Model):
@@ -154,6 +156,7 @@ class Transactions(db.Model):
                 'category_id': self.category_id,
                 'source': self.source_to.serialize() if self.source_to else None, # esto me permite acceso a los datos de source
                 'category': self.category_to.serialize() if self.category_to else None} 
+
 
 class FixedExpenses(db.Model):
     id = db.Column(db.Integer, primary_key=True)

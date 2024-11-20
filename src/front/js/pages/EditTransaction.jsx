@@ -42,7 +42,7 @@ export const EditTransaction = () => {
     return (
                         <form onSubmit={handleSubmit}>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerName">Name</label>
+                                <label className="form-label" htmlFor="registerName">Name<span className="required">*</span></label>
                                 <input
                                     type="text"
                                     id="name"
@@ -50,20 +50,21 @@ export const EditTransaction = () => {
                                     className="form-control"
                                     value={name}
                                     onChange={(event) => setName(event.target.value)}
+                                    required
                                 />
                             </div>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerType">Type of Transaction</label>
+                                <label className="form-label" htmlFor="registerType">Type of Transaction<span className="required">*</span></label>
                                 <select className="form-select" aria-label="Default select example" value={type}
-                                    onChange={(event) => setType(event.target.value)}>
+                                    onChange={(event) => setType(event.target.value)} required >
                                     <option value="">Choose a type of Transaction</option>
                                     <option value="expense">expense</option>
                                     <option value="income">income</option>
                                 </select>
                             </div>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerCategory">Category:</label>
-                                <select className="form-select" aria-label="Default select example" value={category} onChange={(e) => setCategory(e.target.value)}>
+                                <label className="form-label" htmlFor="registerCategory">Category:<span className="required">*</span></label>
+                                <select className="form-select" aria-label="Default select example" value={category} onChange={(e) => setCategory(e.target.value)} required >
                                     <option value="">Select a category</option>
                                     {store.categories && store.categories.map((cat) => (
                                         <option key={cat.id} value={cat.id}>{cat.name}</option>
@@ -71,7 +72,7 @@ export const EditTransaction = () => {
                                 </select>
                             </div>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerCategory">Source:</label>
+                                <label className="form-label" htmlFor="registerCategory">Source:<span className="required">*</span></label>
                                 <select className="form-select" aria-label="Default select example" value={source} onChange={(e) => setSource(e.target.value)}>
                                     <option value="">Select a source</option>
                                     {store.sources && store.sources.map((source) => (
@@ -87,10 +88,11 @@ export const EditTransaction = () => {
                                     aria-label="With textarea"
                                     value={description}
                                     onChange={(event) => setDescription(event.target.value)}
+                                    required 
                                 />
                             </div>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerAmount">Amount</label>
+                                <label className="form-label" htmlFor="registerAmount">Amount<span className="required">*</span></label>
                                 <input
                                     type="text"
                                     id="amount"
@@ -98,10 +100,11 @@ export const EditTransaction = () => {
                                     className="form-control"
                                     value={amount}
                                     onChange={(event) => setAmount(event.target.value)}
+                                    required 
                                 />
                             </div>
                             <div className="form-outline mb-4">
-                                <label className="form-label" htmlFor="registerDate">Date</label>
+                                <label className="form-label" htmlFor="registerDate">Date<span className="required">*</span></label>
                                 <input
                                     type="date"
                                     id="date"

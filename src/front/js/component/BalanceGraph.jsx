@@ -6,7 +6,7 @@ import { Spinner } from "../component/Spinner.jsx";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export const TransactionsChart = () => {
+export const BalanceGraph = () => {
     const { store, actions } = useContext(Context);
 
     const transactionsByMonth = store.transactions.reduce((acc, transaction) => {
@@ -78,7 +78,7 @@ export const TransactionsChart = () => {
             },
             title: {
                 display: true,
-                text: 'Transactions per Month',
+                text: 'Balance Chart',
             },
         },
     };

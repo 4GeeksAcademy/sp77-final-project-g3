@@ -4,12 +4,12 @@ import { Context } from "../store/appContext";
 import "../../styles/nav.css";
 import logoExpenseVue from "../../img/ExpenseVue-Logo.png";
 import { useAuth } from "../../../contexts/authContext/index.jsx";
-import { doSignOut } from "../../../firebase/auth"; 
+import { doSignOut } from "../../../firebase/auth";
 
 export const Navbar = () => {
     const { store, actions } = useContext(Context);
     const { user, isLogged } = store;
-    const { currentUser } = useAuth(); 
+    const { currentUser } = useAuth();
 
     const handleLogout = async () => {
         try {
@@ -33,8 +33,9 @@ export const Navbar = () => {
                 </button>
                 <div className="offcanvas offcanvas-end text-bg-dark" tabIndex="-1" id="offcanvasNavbar2" aria-labelledby="offcanvasNavbar2Label">
                     <div className="offcanvas-header">
-                        <h5 className="offcanvas-title" id="offcanvasNavbar2Label">Menu</h5>
-                        <button type="button" className="btn-close btn-close-dark" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        <Link to="/" className="navbar-brand">
+                            <img className="mb-4 mt-2 mx-5" height="80" src={logoExpenseVue} alt="Logo ExpenseVue" />
+                        </Link>                        <button type="button" className="btn-close btn-close-dark" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div className="offcanvas-body">
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
@@ -54,7 +55,7 @@ export const Navbar = () => {
                                 </Link>
                             </li>
                             {isLogged && (
-                                <li className="nav-item me-2">
+                                <li className="nav-item me-3">
                                     <Link to="/dashboard">
                                         <button id="boton-dashboard" className="btn fw-bold">
                                             Go to Dashboard
