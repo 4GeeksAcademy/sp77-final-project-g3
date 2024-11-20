@@ -25,6 +25,7 @@ export const Sidebar = () => {
     }
 
     return (
+
         <>
             {/* Sidebar para pantallas grandes */}
             <div className="sidebar-container d-none d-lg-block">
@@ -108,6 +109,7 @@ export const Sidebar = () => {
                     <span>© ExpenseVue</span>
                 </div>
             </div>
+
             {/* Sidebar con menú hamburguesa para móviles */}
             <nav className="bg-mobile navbar navbar-expand-lg navbar-dark bg-dark d-lg-none">
                 <div className="container-fluid">
