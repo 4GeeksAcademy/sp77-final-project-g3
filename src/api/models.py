@@ -72,7 +72,7 @@ class Sources(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     yapily_id = db.Column(db.String(), unique=False, nullable=True)
     name = db.Column(db.String(120), unique=False, nullable=False)
-    type_source = db.Column(db.Enum("bank_account", "manual_entry", "credit_card", "debit_card", "others", name="type_source"), nullable=False)
+    type_source = db.Column(db.Enum("bank_account", "manual_entry", "credit_card", "debit_card", name="type_source"), nullable=False)
     amount = db.Column(db.Float(), unique=False, nullable=False, default=0)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     user_to = db.relationship('Users', foreign_keys=[user_id], backref=db.backref('source_to', lazy='select'))

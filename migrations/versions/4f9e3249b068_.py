@@ -1,14 +1,8 @@
 """empty message
 
-<<<<<<<< HEAD:migrations/versions/bb8f62a06e9f_.py
-Revision ID: bb8f62a06e9f
+Revision ID: 4f9e3249b068
 Revises: 
-Create Date: 2024-11-19 20:03:52.849228
-========
-Revision ID: 0813c3fbab85
-Revises: 
-Create Date: 2024-11-19 11:03:48.416019
->>>>>>>> 93e5762fa84179acbc25e3324d35e544fa2bd813:migrations/versions/0813c3fbab85_.py
+Create Date: 2024-11-22 18:04:45.341931
 
 """
 from alembic import op
@@ -16,11 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-<<<<<<<< HEAD:migrations/versions/bb8f62a06e9f_.py
-revision = 'bb8f62a06e9f'
-========
-revision = '0813c3fbab85'
->>>>>>>> 93e5762fa84179acbc25e3324d35e544fa2bd813:migrations/versions/0813c3fbab85_.py
+revision = '4f9e3249b068'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -108,7 +98,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('yapily_id', sa.String(), nullable=True),
     sa.Column('name', sa.String(length=120), nullable=False),
-    sa.Column('type_source', sa.Enum('bank_account', 'manual_entry', 'credit_card', 'debit_card', 'others', name='type_source'), nullable=False),
+    sa.Column('type_source', sa.Enum('bank_account', 'manual_entry', 'credit_card', 'debit_card', name='type_source'), nullable=False),
     sa.Column('amount', sa.Float(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('connection_id', sa.Integer(), nullable=True),

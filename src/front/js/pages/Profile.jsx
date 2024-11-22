@@ -65,7 +65,6 @@ export const Profile = () => {
             const success = await actions.deleteUser(store.user.id);
             if (yapilyRemoval && success) {
                 console.log("Usuario eliminado y redirigido.");
-                window.location.href = "/";  //
             } else {
                 setError("Error al intentar eliminar la cuenta.");
             }

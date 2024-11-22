@@ -39,7 +39,7 @@ export const Login = () => {
         const dataToSend = { email: registerEmail, password: registerPassword };
         const success = await actions.signup(dataToSend);
         if (success) {
-            navigate('/dashboard');
+            navigate('/profile');
         } else {
             setErrorMessage(store.message);
         }

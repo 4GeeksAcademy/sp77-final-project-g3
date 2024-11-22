@@ -164,7 +164,7 @@ export const Transactions = () => {
 										<div className="modal-content">
 											<div className="modal-header">
 												<h5 className="modal-title" id="exampleModalLabel" >New Transaction</h5>
-												<button type="reset" className="btn-close" data-bs-dismiss="modal" aria-label="Close" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}></button>
+												<button type="reset" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 											</div>
 											<div className="modal-body">
 												<form onSubmit={handleSubmit}>
