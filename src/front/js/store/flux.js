@@ -147,23 +147,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ email: '' });
 				localStorage.removeItem('email');
 			},
-			edituser: async (id, dataToSend) => {
-				const uri = ``;
-				const options = {
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(dataToSend),
-				};
-				const response = await fetch(uri, options);
-				if (!options.ok) {
-					console.log('Error:', response.status, response.statusText);
-					return
-				}
-				getActions().setCurrentuser({});
-				getActions().getuser();
-			},
 			setIncomeInStore: (totalIncome) => {
 				setStore((prevStore) => ({
 					...prevStore, // Conserva las propiedades actuales del store
@@ -264,8 +247,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
-				console.log(data);
-				return true;
+				return data;
 			},
 			deleteYapilyUser: async (yapilyId) => {
 				const uri = `${getStore().host}/api/remove-yapily-user`;
@@ -324,6 +306,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				};
 				const data = await response.json();
+				getActions().getConnections();
 				return data;
 			},
 			getBankAccounts: async (consentToken) => {
@@ -581,7 +564,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					headers: {
 						'Content-Type': 'application/json',
 						'Authorization': `Bearer ${token}`
-					},
+					}
 				};
 
 				const response = await fetch(uri, options);
@@ -849,11 +832,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const error = await response.json();
 					setStore({ message: error.message || "Error in signup process" });
 					return false;
-				}
+				};
 				const data = await response.json();
-				localStorage.setItem('token', data.access_token);
-				localStorage.setItem('user', JSON.stringify(data.results));
-				setStore({ token: data.access_token, user: data.results, isLogged: true, message: null });
+				await getActions().login(dataToSend);
 				return true;
 			}
 		}

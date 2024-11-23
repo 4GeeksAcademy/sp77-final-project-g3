@@ -21,8 +21,6 @@ export const Connections = () => {
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
-		actions.getConnections();
-		actions.getSources();
 		const userId = store.user?.id || localStorage.getItem("user_id");
 		if (userId) {
 			actions.getUser(userId).finally(() => setLoading(false));
@@ -56,18 +54,21 @@ export const Connections = () => {
 		if (response && response.authorisationUrl) {
 			window.location.href = response.authorisationUrl;
 		} else {
-			alert("You couldn't get the authorization, please try again!");
+			alert("The action failed...");
 		}
 	}
 
-	const bankConfirmation = () => {
+	const bankConfirmation = async () => {
 		const queryParams = new URLSearchParams(location.search);
 		const consentToken = queryParams.get('consent');
 		const institutionId = queryParams.get('institution');
-		actions.getConsentToken(consentToken, institutionId);
-		setConfirmingBank(false);
-		navigate('/connections');
-		window.location.reload();
+		const success = await actions.getConsentToken(consentToken, institutionId);
+		if (success) {
+			setConfirmingBank(false);
+			navigate('/connections');
+		} else {
+			alert('Something went wrong. Please, try again!')
+		}
 	}
 
 	const getBankAccounts = async (consentToken) => {
@@ -144,7 +145,7 @@ export const Connections = () => {
 					</div>
 					{!store.user.yapily_username ? (
 						<div className="d-flex justify-content-center">
-							<button className="btn connection-btn fw-bold" onClick={createYapilyUser}>
+							<button className="btn btn-secundary" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} onClick={createYapilyUser}>
 								Connect
 							</button>
 						</div>
@@ -152,21 +153,36 @@ export const Connections = () => {
 						<>
 							<div className="d-flex justify-content-center">
 								<form className="col-6 text-center" onSubmit={handleAuthorization}>
-									<select className="form-select" aria-label="Default select example" value={bank} onChange={(e) => setBank(e.target.value)}>
-										{Array.isArray(institutions) && Array.isArray(connections) && institutions.some(
-											institution => !connections.some(connection => connection.institution_id === institution.id)
-										) ? (
-											<>
-												<option value="" disabled>Select your bank</option>
-												{institutions.filter(institution => !connections.some(connection => connection.institution_id === institution.id)).map(institution => (
-													<option key={institution.id} value={institution.yapily_id}>{institution.name}</option>
-												))}
-											</>
-										) : (
-											<option value="" disabled>We don't have more banks currently.</option>
-										)}
-									</select>
-									<button type="submit" className="btn connection-btn fw-bold mt-3">
+									<div className="d-flex">
+										<select className="form-select" aria-label="Default select example" value={bank} onChange={(e) => setBank(e.target.value)}>
+											{Array.isArray(institutions) && Array.isArray(connections) ? (
+												<>
+													<option value="" disabled>Select your bank</option>
+													{institutions.filter(institution => !connections.some(connection => connection.institution_id === institution.id && connection.consent_token)).map(institution => (
+														<option key={institution.id} value={institution.yapily_id}>{institution.name}</option>
+													))}
+												</>
+											) : (
+												<option value="" disabled>We don't have more banks currently.</option>
+											)}
+										</select>
+										<button type="button" className="btn btn-warning ms-3" data-bs-toggle="modal" data-bs-target="#ImportantNote"><i className="far fa-lightbulb"></i></button>
+									</div>
+									<div className="modal fade" id="ImportantNote">
+										<div className="modal-dialog">
+											<div className="modal-content">
+												<div className="modal-header">
+													<h5 className="modal-title">Important Note</h5>
+													<button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div className="modal-body text-start">
+													<p>These are all test banks.</p>
+													<p>You can check how to login on <a href="https://docs.yapily.com/pages/resources/sandbox/sandbox-credentials/" target="_blank">Yapily Docs</a>.</p>
+												</div>
+											</div>
+										</div>
+									</div>
+									<button type="submit" className="btn btn-secondary mt-3" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>
 										Ask for authorization
 									</button>
 								</form>
@@ -174,7 +190,7 @@ export const Connections = () => {
 							<div className="mt-5">
 								<p className="text-muted text-center">
 									If you couldn't find your bank in our available institutions or you just need to do a manual entry, please add your source here.
-									<button type="button" className="btn connection-btn ms-2" data-bs-toggle="modal" data-bs-target="#NewSourceModal"><i className="fas fa-plus"></i></button>
+									<button type="button" className="btn btn-secondary ms-2" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} data-bs-toggle="modal" data-bs-target="#NewSourceModal"><i className="fas fa-plus"></i></button>
 								</p>
 								<div className="modal fade" id="NewSourceModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
 									<div className="modal-dialog">
@@ -187,22 +203,21 @@ export const Connections = () => {
 												<form onSubmit={addSource}>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerName">Name<span className="required">*</span></label>
-														<input type="text" id="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} required/>
+														<input type="text" id="name" className="form-control" value={name} onChange={(event) => setName(event.target.value)} required />
 													</div>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerType">Type of the Source<span className="required">*</span></label>
-														<select className="form-select" aria-label="Default select example" value={type} onChange={(event) => setType(event.target.value)}required>
+														<select className="form-select" aria-label="Default select example" value={type} onChange={(event) => setType(event.target.value)} required>
 															<option value="" disabled>Choose the type of the source</option>
 															<option value="bank_account">Bank Account</option>
 															<option value="credit_card">Credit Card</option>
 															<option value="debit_card">Debit Card</option>
 															<option value="manual_entry">Manual Entry</option>
-															<option value="others">Other</option>
 														</select>
 													</div>
 													<div className="form-outline mb-4">
 														<label className="form-label" htmlFor="registerAmount">Amount<span className="required">*</span></label>
-														<input type="text" id="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} required/>
+														<input type="text" id="amount" className="form-control" value={amount} onChange={(event) => setAmount(event.target.value)} required />
 													</div>
 													<div className="modal-footer">
 														<button type="submit" className="btn" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }}>Add Source</button>
@@ -265,8 +280,8 @@ export const Connections = () => {
 								}
 							</div>
 							{Array.isArray(sources) && sources.some((manualSource) => !manualSource.yapily_id) ?
-							<div className="text-center mt-5">
-								<h5>Other sources</h5>
+								<div className="text-center mt-5">
+									<h5>Other sources</h5>
 									<div className="accordion" id="accordionExample2">
 										<div className="accordion-item">
 											<h2 className="accordion-header">
@@ -306,10 +321,10 @@ export const Connections = () => {
 											</div>
 										</div>
 									</div>
-							</div>
-							:
-							''
-						}
+								</div>
+								:
+								''
+							}
 						</>
 					)}
 				</div>
@@ -320,7 +335,7 @@ export const Connections = () => {
 						<p className="text-muted">
 							Please, confirm to save the bank.
 						</p>
-						<button className="btn connection-btn fw-bold" onClick={bankConfirmation}>
+						<button className="btn btn-secondary" style={{ backgroundColor: '#2D3748', color: '#E2E8F0' }} onClick={bankConfirmation}>
 							Confirm
 						</button>
 					</div>

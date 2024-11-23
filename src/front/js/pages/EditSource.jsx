@@ -48,7 +48,6 @@ export const EditSource = () => {
                     <option value="credit_card">Credit Card</option>
                     <option value="debit_card">Debit Card</option>
                     <option value="manual_entry">Manual Entry</option>
-                    <option value="others">Other</option>
                 </select>
             </div>
             <div className="form-outline mb-4">

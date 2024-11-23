@@ -38,7 +38,7 @@ const injectContext = PassedComponent => {
 				state.actions.getBudgets();
 				state.actions.getFixedExpenses();
 				state.actions.getSources();
-				// state.actions.getBalance();
+				state.actions.getBalance();
 				state.actions.getCategories();
 				
 			}

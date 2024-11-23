@@ -38,12 +38,17 @@ def handle_hello():
 @api.route('/signup', methods=['POST'])
 def signup():
     response_body = {}
+    rows = db.session.execute(db.select(Users)).scalars()
     data = request.json
     new_user = Users(email = data.get('email'),
                      password = data.get('password'),
                      first_name = data.get('first_name'),
                      last_name = data.get('last_name'),
                      phone_number = data.get('phone_number'))
+    existing_user = db.session.execute(db.select(Users).where(Users.email == data.get('email'))).scalar()
+    if existing_user:
+        response_body['message'] = "There is already an account with this email"
+        return response_body, 400
     db.session.add(new_user)
     db.session.commit()
     response_body['message'] = "Registration succeeded!"
@@ -390,8 +395,8 @@ def balances():
     current_user = get_jwt_identity()
     row = db.session.execute(db.select(Balances).where(Balances.user_id == current_user['user_id'])).scalar()
     if not row:
-        response_body['message'] = "You do not have a balance"
-        return response_body, 403
+        response_body['message'] = "Your balance is empty"
+        return response_body, 200
     result = row.serialize()
     response_body['message'] = "This is your balance (GET)"
     response_body['results'] = result
